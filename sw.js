@@ -3,7 +3,7 @@
    國度321空中團契
    每次更新內容，只要改下面這一行的版本號即可。
    ========================================================= */
-const VERSION = '3.4.0';
+const VERSION = '3.4.1';
 const CACHE = 'g321-' + VERSION;
 
 /* 預先快取：離線也要能完整使用的檔案 */
@@ -12,10 +12,10 @@ const PRECACHE = [
   './index.html',
   './a01-new-life.html',
   './manifest.json',
-  './assets/icon-180.png',
-  './assets/icon-192.png',
-  './assets/icon-512.png',
-  './assets/icon-maskable-512.png'
+  './icon-180.png',
+  './icon-192.png',
+  './icon-512.png',
+  './icon-maskable-512.png'
 ];
 
 self.addEventListener('install', event => {
