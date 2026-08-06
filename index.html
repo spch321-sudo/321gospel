@@ -237,8 +237,10 @@ details .dbody{padding:0 14px 14px}
 .sheet{
   position:fixed;inset:0;z-index:60;background:var(--bg);
   overflow-y:auto;-webkit-overflow-scrolling:touch;
-  padding-top:calc(var(--safe-t) + 52px);padding-bottom:calc(var(--safe-b) + 20px)
+  padding-top:0;padding-bottom:calc(var(--safe-b) + 20px)
 }
+/* 捲動容器內不可用 position:fixed，iOS 會算錯觸控位置 */
+.sheet > .topbar{position:sticky;top:0;left:auto;right:auto}
 .sheet.hidden{display:none}
 .frame{position:fixed;inset:0;z-index:70;background:var(--bg);display:flex;flex-direction:column}
 .frame.hidden{display:none}
