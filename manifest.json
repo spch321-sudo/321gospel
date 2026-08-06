@@ -1,0 +1,26 @@
+{
+  "name": "321 福音同行",
+  "short_name": "福音同行",
+  "description": "陪伴每一個人成為得勝者。七里程陪伴、五幕福音、三套課程、疑問解答庫。資料留在自己的裝置。",
+  "lang": "zh-Hant",
+  "dir": "ltr",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#4E2061",
+  "background_color": "#4E2061",
+  "icons": [
+    { "src": "assets/icon-180.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "assets/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "assets/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "assets/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "今日", "url": "./#today", "icons": [{ "src": "assets/icon-192.png", "sizes": "192x192" }] },
+    { "name": "同行名單", "url": "./#walk", "icons": [{ "src": "assets/icon-192.png", "sizes": "192x192" }] },
+    { "name": "福音卡片", "url": "./#cards", "icons": [{ "src": "assets/icon-192.png", "sizes": "192x192" }] },
+    { "name": "學習", "url": "./#learn", "icons": [{ "src": "assets/icon-192.png", "sizes": "192x192" }] },
+    { "name": "開始代禱", "url": "./#pray", "icons": [{ "src": "assets/icon-192.png", "sizes": "192x192" }] }
+  ]
+}
