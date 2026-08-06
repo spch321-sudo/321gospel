@@ -7482,6 +7482,37 @@ window.addEventListener('pagehide', () => TTS.stop());
 if ('serviceWorker' in navigator)
   window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 
+
+/* ===== 臨時診斷：找出擋住覆蓋層的元素（確認後請移除整段） ===== */
+(function () {
+  var bar = document.createElement('div');
+  bar.style.cssText = 'position:fixed;left:0;right:0;bottom:0;z-index:99999;' +
+    'background:#000;color:#0f0;font:12px/1.5 monospace;padding:6px 8px;' +
+    'pointer-events:none;white-space:pre-wrap;word-break:break-all';
+  bar.textContent = '診斷版就緒：請點設定頁的按鈕';
+  document.body.appendChild(bar);
+
+  function desc(el) {
+    if (!el) return 'null';
+    var c = (typeof el.className === 'string' ? el.className : '') || '-';
+    var a = (el.dataset && el.dataset.act) ? el.dataset.act : '-';
+    return el.tagName + ' #' + (el.id || '-') + ' .' + c + ' act=' + a;
+  }
+  function report(tag, x, y) {
+    var top = document.elementFromPoint(x, y);
+    var z = top, chain = [];
+    while (z && chain.length < 3) { chain.push(desc(z)); z = z.parentElement; }
+    bar.textContent = tag + ' @' + Math.round(x) + ',' + Math.round(y) +
+      '\n最上層：' + chain.join('\n  ↑ ');
+  }
+  document.addEventListener('touchstart', function (e) {
+    var t = e.touches[0]; if (t) report('touch', t.clientX, t.clientY);
+  }, true);
+  document.addEventListener('click', function (e) {
+    bar.textContent += '\nclick 有觸發 → ' + desc(e.target);
+  }, true);
+})();
+
 boot();
 })();
 
