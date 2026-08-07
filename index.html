@@ -235,14 +235,14 @@ details .dbody{padding:0 14px 14px}
 
 /* ---------- 覆蓋層 ---------- */
 .sheet{
-  position:fixed;inset:0;z-index:60;background:var(--bg);
+  position:fixed;top:0;right:0;bottom:0;left:0;z-index:60;background:var(--bg);
   overflow-y:auto;-webkit-overflow-scrolling:touch;
   padding-top:0;padding-bottom:calc(var(--safe-b) + 20px)
 }
 /* 捲動容器內不用 position:fixed，iOS 會算錯觸控位置 */
 .sheet > .topbar{position:sticky;top:0;left:auto;right:auto}
 .sheet.hidden{display:none}
-.frame{position:fixed;inset:0;z-index:70;background:var(--bg);display:flex;flex-direction:column}
+.frame{position:fixed;top:0;right:0;bottom:0;left:0;z-index:70;background:var(--bg);display:flex;flex-direction:column}
 .frame.hidden{display:none}
 .frame .fbar{
   background:var(--navy);color:#fff;padding:var(--safe-t) 10px 0;
@@ -261,14 +261,14 @@ details .dbody{padding:0 14px 14px}
 }
 .toast.on{opacity:.96}
 
-.modal{position:fixed;inset:0;z-index:80;background:rgba(15,20,26,.55);
+.modal{position:fixed;top:0;right:0;bottom:0;left:0;z-index:80;background:rgba(15,20,26,.55);
   display:flex;align-items:center;justify-content:center;padding:20px}
 .modal.hidden{display:none}
 .modal .box{background:var(--card);border-radius:16px;padding:20px;max-width:440px;width:100%;
   max-height:82dvh;overflow-y:auto}
 
 /* ---------- 首次啟動守則 ---------- */
-#gate{position:fixed;inset:0;z-index:100;background:var(--bg);overflow-y:auto;
+#gate{position:fixed;top:0;right:0;bottom:0;left:0;z-index:100;background:var(--bg);overflow-y:auto;
   padding:calc(var(--safe-t) + 24px) 20px calc(var(--safe-b) + 24px)}
 #gate.hidden{display:none}
 #gate .inner{max-width:560px;margin:0 auto}
@@ -280,7 +280,7 @@ details .dbody{padding:0 14px 14px}
 }
 [data-theme="dark"] #gate li .n{color:#11161C}
 
-#lock{position:fixed;inset:0;z-index:110;background:var(--bg);overflow-y:auto;
+#lock{position:fixed;top:0;right:0;bottom:0;left:0;z-index:110;background:var(--bg);overflow-y:auto;
   padding:calc(var(--safe-t) + 28px) 20px calc(var(--safe-b) + 24px)}
 #lock.hidden{display:none}
 #lock .inner{max-width:420px;margin:0 auto}
@@ -312,7 +312,7 @@ hr.sep{border:0;border-top:1px solid var(--line);margin:18px 0}
 .xz-fab:active{filter:brightness(.92)}
 .xz-fab .ic{font-size:calc(19px * var(--fs));line-height:1}
 
-.xz-overlay{position:fixed;inset:0;z-index:95;background:rgba(15,20,26,.5);display:flex;align-items:flex-end}
+.xz-overlay{position:fixed;top:0;right:0;bottom:0;left:0;z-index:95;background:rgba(15,20,26,.5);display:flex;align-items:flex-end}
 .xz-sheet{
   width:100%;max-width:720px;margin:0 auto;height:92dvh;
   background:var(--bg);border-radius:18px 18px 0 0;
