@@ -7518,16 +7518,17 @@ boot();
   var EP = 'https://azure-tts.spch321.workers.dev';
 
   /* 三語聲音清單：key 是存檔用的代號，name 是語音服務的聲音代號 */
+  var SAFE = 'zh-TW-YunJheNeural';   /* 空中團契已驗證可用的代號，當作保底 */
   var VOICES = {
     tc: [
-      { k:'yunjhe',  name:'zh-TW-YunJheNeural',   label:'雲哲', desc:'溫潤親切男聲（預設）' },
-      { k:'hsiaoyu', name:'zh-TW-HsiaoYuNeural',  label:'曉雨', desc:'清亮女聲' },
-      { k:'hsiaochen', name:'zh-TW-HsiaoChenNeural', label:'曉臻', desc:'沉穩女聲' }
+      { k:'yunjhe',   name:'zh-TW-YunJheNeural',                label:'雲哲', desc:'溫潤親切男聲（預設）' },
+      { k:'yunfan',   name:'zh-CN-Yunfan:DragonHDLatestNeural',  label:'雲帆', desc:'高清男聲 HD' },
+      { k:'xiaochen', name:'zh-CN-Xiaochen:DragonHDLatestNeural',label:'曉辰', desc:'高清女聲 HD' }
     ],
     sc: [
-      { k:'yunxi',    name:'zh-CN-YunxiNeural',    label:'雲希', desc:'溫暖男聲（預設）' },
-      { k:'xiaoxiao', name:'zh-CN-XiaoxiaoNeural', label:'曉曉', desc:'親切女聲' },
-      { k:'yunjian',  name:'zh-CN-YunjianNeural',  label:'雲健', desc:'厚實男聲' }
+      { k:'yunfan',   name:'zh-CN-Yunfan:DragonHDLatestNeural',  label:'云帆', desc:'高清男声 HD（预设）' },
+      { k:'xiaochen', name:'zh-CN-Xiaochen:DragonHDLatestNeural',label:'晓辰', desc:'高清女声 HD' },
+      { k:'yunjhe',   name:'zh-TW-YunJheNeural',                label:'云哲', desc:'温润男声' }
     ],
     en: [
       { k:'guy',   name:'en-US-GuyNeural',   label:'Guy',   desc:'Warm male voice (default)' },
@@ -7652,10 +7653,17 @@ boot();
     return new Promise(function (res, rej) {
       cacheGet(key, function (blob) {
         if (blob) { try { var u = URL.createObjectURL(blob); rv.cache[key] = u; res(u); return; } catch (e) {} }
-        fetch(EP, { method:'POST', headers:{ 'Content-Type':'application/json' },
-          body: JSON.stringify({ voice: voiceName(), rate: rateAttr(),
-                                 sil:140, silc:140, sile:260, text: piece }) })
-          .then(function (r) { if (!r.ok) throw new Error('TTS ' + r.status); return r.blob(); })
+        function ask(vn) {
+          return fetch(EP, { method:'POST', headers:{ 'Content-Type':'application/json' },
+            body: JSON.stringify({ voice: vn, rate: rateAttr(),
+                                   sil:140, silc:140, sile:260, text: piece }) })
+            .then(function (r) { if (!r.ok) throw new Error('TTS ' + r.status); return r.blob(); });
+        }
+        ask(voiceName())
+          .catch(function (e) {                    /* 這個聲音後端不收，改用保底聲音再試一次 */
+            if (voiceName() === SAFE) throw e;
+            return ask(SAFE);
+          })
           .then(function (b) {
             try { cachePut(key, b); } catch (e) {}
             var u; try { u = URL.createObjectURL(b); rv.cache[key] = u; } catch (e) {}
