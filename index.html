@@ -7556,6 +7556,9 @@ boot();
     return (pct >= 0 ? '+' : '') + pct + '%';
   }
 
+  var origSpeak = TTS.speak.bind(TTS);
+  var origStop = TTS.stop.bind(TTS);
+
   var SILENT = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA=';
   var rv = { audio:null, cache:{}, unlocked:false, queue:[], idx:0, token:0, active:false };
 
@@ -7569,7 +7572,16 @@ boot();
     return rv.audio;
   }
   /* iOS 必須在使用者手勢裡先播一次無聲，之後才准自動播放 */
+  var ssUnlocked = false;
+  function unlockSpeech() {
+    if (ssUnlocked || !('speechSynthesis' in window)) return;
+    try {
+      var u = new SpeechSynthesisUtterance(' ');
+      u.volume = 0; speechSynthesis.speak(u); ssUnlocked = true;
+    } catch (e) {}
+  }
   function unlock() {
+    unlockSpeech();
     if (rv.unlocked) return;
     try {
       var a = audio(); a.loop = false; a.src = SILENT;
@@ -7697,17 +7709,21 @@ boot();
           fallbackChunk(rv.queue[i], function () { if (my === rv.token) playAt(i + 1); });
         });
         if (rv.queue[i + 1]) fetchPiece(rv.queue[i + 1]).catch(function () {});
-      }).catch(function () {
+      }).catch(function (err) {
+        if (i === 0) {                       /* 一開始就連不上：整段交回原本的引擎 */
+          rvStop();
+          toast('真人語音連不上（' + (err && err.message ? err.message : '無回應') + '），改用系統語音');
+          origSpeak(text);
+          return;
+        }
         fallbackChunk(rv.queue[i], function () { if (my === rv.token) playAt(i + 1); });
       });
     }
     playAt(0);
-    toast('開始朗讀，再按一次可停止');
   }
 
   /* ---- 接到原本的朗讀鈕上：所有「🔊 朗讀」自動改用真人聲音 ---- */
-  var origSpeak = TTS.speak.bind(TTS);
-  var origStop = TTS.stop.bind(TTS);
+
 
   TTS.stop = function () { rvStop(); origStop(); };
   TTS.speak = function (text) {
