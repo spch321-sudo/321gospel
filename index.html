@@ -70,6 +70,7 @@ a{color:var(--navy)}
   display:flex;align-items:center;justify-content:center;
   font-size:calc(14px * var(--fs));padding:0 8px;gap:4px
 }
+.tb-btn{flex:0 0 auto}
 .tb-btn:active{background:rgba(255,255,255,.18)}
 
 .nav{
@@ -234,13 +235,14 @@ details[open]>summary::after{content:"－"}
 details .dbody{padding:0 14px 14px}
 
 /* ---------- 覆蓋層 ---------- */
+/* 上下兩段式：外框只負責蓋滿畫面，內容區自己捲。
+   不在固定定位的外框裡再放捲動＋固定元素，iOS 26 才不會錯亂。 */
 .sheet{
   position:fixed;top:0;right:0;bottom:0;left:0;z-index:60;background:var(--bg);
-  overflow-y:auto;-webkit-overflow-scrolling:touch;
-  padding-top:0;padding-bottom:calc(var(--safe-b) + 20px)
+  display:flex;flex-direction:column;overflow:hidden;isolation:isolate
 }
-/* 捲動容器內不用 position:fixed，iOS 會算錯觸控位置 */
-.sheet > .topbar{position:sticky;top:0;left:auto;right:auto}
+.sheet > .topbar{position:relative;flex:0 0 auto;top:auto;left:auto;right:auto}
+#sheetView{flex:1 1 auto;overflow-y:auto;padding-bottom:calc(var(--safe-b) + 24px)}
 .sheet.hidden{display:none}
 .frame{position:fixed;top:0;right:0;bottom:0;left:0;z-index:70;background:var(--bg);display:flex;flex-direction:column}
 .frame.hidden{display:none}
@@ -414,6 +416,7 @@ hr.sep{border:0;border-top:1px solid var(--line);margin:18px 0}
   <button class="tb-btn" id="backBtn" hidden aria-label="返回">‹ 返回</button>
   <h1 id="title">321福音同行</h1>
   <button class="tb-btn" id="speakBtn" aria-label="朗讀本頁">🔊 朗讀</button>
+  <button class="tb-btn" id="setBtn" aria-label="設定">⚙️ 設定</button>
 </header>
 
 <main id="app"><div class="wrap" id="view"></div></main>
@@ -872,7 +875,7 @@ async function drawSheet() {
   const html = await SHEETS[top.name](top.arg);
   sv.innerHTML = html;
   $('#sheetTitle').textContent = top.title || '';
-  $('#sheet').scrollTop = 0;
+  $('#sheetView').scrollTop = 0;
   bind(sv);
 }
 function closeSheet(silent) {
@@ -3862,7 +3865,7 @@ function quicks() {
 function baseSystem() {
   const lg = (window.I18N && window.I18N.lang) || 'tc';
   const langLine = lg === 'en'
-    ? 'IMPORTANT: The user is using the English interface. Reply entirely in natural English.'
+    ? 'IMPORTANT: The user is using the English interface. Reply entirely in natural English. Your name in English is "AI Sage" — always call yourself AI Sage, never Xiaozhi.'
     : lg === 'sc'
       ? '重要：使用者正在使用简体中文介面，请全程以简体中文回答。'
       : '重要：使用者正在使用繁體中文介面，請全程以繁體中文回答。';
@@ -7470,6 +7473,7 @@ document.querySelectorAll('.nav button').forEach(b =>
   b.addEventListener('click', () => go(b.dataset.tab)));
 $('#sheetBack').addEventListener('click', () => popSheet());
 $('#speakBtn').addEventListener('click', () => TTS.speak(readableText($('#view'))));
+$('#setBtn').addEventListener('click', () => { if (window.__G && window.__G.ACTS.openSettings) window.__G.ACTS.openSettings(); });
 $('#sheetSpeak').addEventListener('click', () => TTS.speak(readableText($('#sheetView'))));
 $('#frameClose').addEventListener('click', () => {
   $('#frame').classList.add('hidden'); $('#frameBody').src = 'about:blank';
@@ -7497,5 +7501,270 @@ boot();
 })();
 
 </script>
+
+<script>
+/* =========================================================
+   真人語音朗讀引擎（移植自國度321空中團契）
+   繁體 · 簡體 · 英文各有專屬聲音；金鑰保管在後端代理，
+   前端只送文字、收音檔。連不上時自動退回系統語音，
+   絕不因為後端出狀況就讓長輩按不出聲音。
+   ========================================================= */
+(function () {
+  'use strict';
+  var G = window.__G; if (!G) return;
+  var LS = G.LS, TTS = G.TTS, toast = G.toast, esc = G.esc,
+      ACTS = G.ACTS, SHEETS = G.SHEETS, refreshSheet = G.refreshSheet, S = G.S;
+
+  var EP = 'https://azure-tts.spch321.workers.dev';
+
+  /* 三語聲音清單：key 是存檔用的代號，name 是語音服務的聲音代號 */
+  var VOICES = {
+    tc: [
+      { k:'yunjhe',  name:'zh-TW-YunJheNeural',   label:'雲哲', desc:'溫潤親切男聲（預設）' },
+      { k:'hsiaoyu', name:'zh-TW-HsiaoYuNeural',  label:'曉雨', desc:'清亮女聲' },
+      { k:'hsiaochen', name:'zh-TW-HsiaoChenNeural', label:'曉臻', desc:'沉穩女聲' }
+    ],
+    sc: [
+      { k:'yunxi',    name:'zh-CN-YunxiNeural',    label:'雲希', desc:'溫暖男聲（預設）' },
+      { k:'xiaoxiao', name:'zh-CN-XiaoxiaoNeural', label:'曉曉', desc:'親切女聲' },
+      { k:'yunjian',  name:'zh-CN-YunjianNeural',  label:'雲健', desc:'厚實男聲' }
+    ],
+    en: [
+      { k:'guy',   name:'en-US-GuyNeural',   label:'Guy',   desc:'Warm male voice (default)' },
+      { k:'jenny', name:'en-US-JennyNeural', label:'Jenny', desc:'Clear female voice' },
+      { k:'aria',  name:'en-US-AriaNeural',  label:'Aria',  desc:'Gentle female voice' }
+    ]
+  };
+
+  function lang() { return (window.I18N && window.I18N.lang) || 'tc'; }
+  function list() { return VOICES[lang()] || VOICES.tc; }
+  function voiceKey() {
+    var saved = LS.get('rvVoice_' + lang(), '');
+    var L = list();
+    for (var i = 0; i < L.length; i++) if (L[i].k === saved) return saved;
+    return L[0].k;
+  }
+  function voiceName() {
+    var L = list(), k = voiceKey();
+    for (var i = 0; i < L.length; i++) if (L[i].k === k) return L[i].name;
+    return L[0].name;
+  }
+  function on() { return LS.get('rvOn', true) !== false; }
+  function rateAttr() {
+    var r = +S.ttsRate || 0.95;
+    var pct = Math.round((r - 1) * 100);
+    return (pct >= 0 ? '+' : '') + pct + '%';
+  }
+
+  var SILENT = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA=';
+  var rv = { audio:null, cache:{}, unlocked:false, queue:[], idx:0, token:0, active:false };
+
+  function audio() {
+    if (!rv.audio) {
+      rv.audio = new Audio(); rv.audio.preload = 'auto';
+      try { rv.audio.playsInline = true;
+            rv.audio.setAttribute('playsinline','');
+            rv.audio.setAttribute('webkit-playsinline',''); } catch (e) {}
+    }
+    return rv.audio;
+  }
+  /* iOS 必須在使用者手勢裡先播一次無聲，之後才准自動播放 */
+  function unlock() {
+    if (rv.unlocked) return;
+    try {
+      var a = audio(); a.loop = false; a.src = SILENT;
+      var p = a.play();
+      if (p && p.then) p.then(function () { rv.unlocked = true; try { a.pause(); } catch (e) {} })
+                        .catch(function () {});
+      else rv.unlocked = true;
+    } catch (e) {}
+  }
+
+  /* 依標點切句，一段 100 到 300 字，唸起來自然、請求數也不會太多 */
+  function chunks(text) {
+    var t = String(text || '').replace(/\s+/g, ' ').trim();
+    if (!t) return [];
+    var enders = '。！？；.!?\n', out = [], buf = '';
+    for (var i = 0; i < t.length; i++) {
+      buf += t[i];
+      if (enders.indexOf(t[i]) >= 0 && buf.length >= 100) { out.push(buf); buf = ''; }
+    }
+    if (buf.trim()) out.push(buf);
+    var fin = [];
+    out.forEach(function (seg) {
+      while (seg.length > 300) { fin.push(seg.slice(0, 300)); seg = seg.slice(300); }
+      if (seg) fin.push(seg);
+    });
+    return fin.length ? fin : [t];
+  }
+
+  /* IndexedDB 永久快取：同一段話同一個聲音，只跟後端要一次 */
+  var DBN = 'g321_tts_cache';
+  function dbOpen(cb) {
+    try {
+      if (!window.indexedDB) return cb(null);
+      var q = indexedDB.open(DBN, 1);
+      q.onupgradeneeded = function () {
+        try { var d = q.result;
+              if (!d.objectStoreNames.contains('audio')) d.createObjectStore('audio'); } catch (e) {}
+      };
+      q.onsuccess = function () { cb(q.result); };
+      q.onerror = function () { cb(null); };
+    } catch (e) { cb(null); }
+  }
+  function cacheGet(k, cb) {
+    dbOpen(function (d) { if (!d) return cb(null);
+      try { var r = d.transaction('audio','readonly').objectStore('audio').get(k);
+            r.onsuccess = function () { cb(r.result || null); };
+            r.onerror = function () { cb(null); };
+      } catch (e) { cb(null); }
+    });
+  }
+  function cachePut(k, b) {
+    dbOpen(function (d) { if (!d) return;
+      try { d.transaction('audio','readwrite').objectStore('audio').put(b, k); } catch (e) {}
+    });
+  }
+  function cacheClear(cb) {
+    dbOpen(function (d) { if (!d) { if (cb) cb(false); return; }
+      try { var r = d.transaction('audio','readwrite').objectStore('audio').clear();
+            r.onsuccess = function () { rv.cache = {}; if (cb) cb(true); };
+            r.onerror = function () { if (cb) cb(false); };
+      } catch (e) { if (cb) cb(false); }
+    });
+  }
+
+  function fetchPiece(piece) {
+    var key = voiceName() + '|' + rateAttr() + '|' + piece;
+    if (rv.cache[key]) return Promise.resolve(rv.cache[key]);
+    return new Promise(function (res, rej) {
+      cacheGet(key, function (blob) {
+        if (blob) { try { var u = URL.createObjectURL(blob); rv.cache[key] = u; res(u); return; } catch (e) {} }
+        fetch(EP, { method:'POST', headers:{ 'Content-Type':'application/json' },
+          body: JSON.stringify({ voice: voiceName(), rate: rateAttr(),
+                                 sil:140, silc:140, sile:260, text: piece }) })
+          .then(function (r) { if (!r.ok) throw new Error('TTS ' + r.status); return r.blob(); })
+          .then(function (b) {
+            try { cachePut(key, b); } catch (e) {}
+            var u; try { u = URL.createObjectURL(b); rv.cache[key] = u; } catch (e) {}
+            res(u);
+          })
+          .catch(rej);
+      });
+    });
+  }
+
+  function rvStop() {
+    rv.token++; rv.active = false; rv.queue = []; rv.idx = 0;
+    if (rv.audio) { try { rv.audio.pause(); } catch (e) {} rv.audio.onended = null; rv.audio.onerror = null; }
+    try { if (navigator.mediaSession) navigator.mediaSession.playbackState = 'none'; } catch (e) {}
+  }
+
+  /* 某一段抓不到，就用系統語音把這一段補完，唸完再接下一段 */
+  function fallbackChunk(piece, cb) {
+    if (!('speechSynthesis' in window)) { if (cb) cb(); return; }
+    try {
+      var u = new SpeechSynthesisUtterance(piece);
+      u.lang = (window.I18N && window.I18N.ttsLang) ? window.I18N.ttsLang() : 'zh-TW';
+      u.rate = +S.ttsRate || 0.95;
+      u.onend = cb; u.onerror = cb;
+      speechSynthesis.speak(u);
+    } catch (e) { if (cb) cb(); }
+  }
+
+  function rvSpeak(text) {
+    unlock();
+    var q = chunks(text);
+    if (!q.length) { toast('這一頁沒有可朗讀的內容'); return; }
+    rv.queue = q; rv.idx = 0; rv.active = true;
+    var my = ++rv.token, a = audio();
+    try {
+      if (navigator.mediaSession && window.MediaMetadata) {
+        navigator.mediaSession.metadata = new MediaMetadata({ title: '321福音同行' });
+        navigator.mediaSession.playbackState = 'playing';
+      }
+    } catch (e) {}
+    function playAt(i) {
+      if (my !== rv.token) return;
+      if (i >= rv.queue.length) { rvStop(); return; }
+      fetchPiece(rv.queue[i]).then(function (url) {
+        if (my !== rv.token) return;
+        a.onended = null; a.onerror = null; a.src = url;
+        a.onended = function () { if (my === rv.token) playAt(i + 1); };
+        a.onerror = function () { fallbackChunk(rv.queue[i], function () { if (my === rv.token) playAt(i + 1); }); };
+        var p = a.play();
+        if (p && p.catch) p.catch(function () {
+          fallbackChunk(rv.queue[i], function () { if (my === rv.token) playAt(i + 1); });
+        });
+        if (rv.queue[i + 1]) fetchPiece(rv.queue[i + 1]).catch(function () {});
+      }).catch(function () {
+        fallbackChunk(rv.queue[i], function () { if (my === rv.token) playAt(i + 1); });
+      });
+    }
+    playAt(0);
+    toast('開始朗讀，再按一次可停止');
+  }
+
+  /* ---- 接到原本的朗讀鈕上：所有「🔊 朗讀」自動改用真人聲音 ---- */
+  var origSpeak = TTS.speak.bind(TTS);
+  var origStop = TTS.stop.bind(TTS);
+
+  TTS.stop = function () { rvStop(); origStop(); };
+  TTS.speak = function (text) {
+    if (rv.active || TTS.speaking) { TTS.stop(); toast('已停止朗讀'); return; }
+    if (on() && /^https?:\/\//i.test(EP)) rvSpeak(text);
+    else origSpeak(text);
+  };
+  window.__rvClearCache = cacheClear;
+
+  document.addEventListener('visibilitychange', function () { if (document.hidden) rvStop(); });
+
+  /* ---- 設定頁：真人語音開關與聲音選擇 ---- */
+  ACTS.setRealVoice = function (d) { LS.set('rvOn', d.v === '1'); TTS.stop(); refreshSheet(); };
+  ACTS.setRvVoice = function (d) { LS.set('rvVoice_' + lang(), d.v); TTS.stop(); refreshSheet(); };
+  ACTS.tryRvVoice = function () {
+    var demo = lang() === 'en'
+      ? 'Jesus is my Role Model. The Bible is my Standard. The Holy Spirit is my Guide.'
+      : lang() === 'sc'
+        ? '耶稣是我的榜样，圣经是我的准则，圣灵是我的引导。'
+        : '耶穌是我的榜樣，聖經是我的準則，聖靈是我的引導。';
+    TTS.stop(); setTimeout(function () { TTS.speak(demo); }, 120);
+  };
+  ACTS.clearVoiceCache = function () {
+    cacheClear(function (ok) { toast(ok ? '已清空語音快取' : '清除失敗，請稍後再試'); });
+  };
+
+  var _set = SHEETS.settings;
+  SHEETS.settings = async function () {
+    var html = await _set.apply(this, arguments);
+    var L = list();
+    var block =
+      '<div class="card">' +
+      '<div class="eyebrow">真人語音</div>' +
+      '<p class="tiny">像真人一樣的朗讀聲音，比手機內建的語音自然得多。' +
+      '第一次唸會稍等一下，之後同一段話就直接播，不用再等。</p>' +
+      '<div class="seg" style="margin-top:8px">' +
+      '<button data-act="setRealVoice" data-v="1" aria-pressed="' + on() + '">真人語音</button>' +
+      '<button data-act="setRealVoice" data-v="0" aria-pressed="' + (!on()) + '">系統語音</button>' +
+      '</div>' +
+      (on() ?
+        '<div class="eyebrow" style="margin-top:14px">選一個聲音</div><div class="seg">' +
+        L.map(function (v) {
+          return '<button data-act="setRvVoice" data-v="' + v.k + '" aria-pressed="' +
+                 (voiceKey() === v.k) + '">' + esc(v.label) + '</button>';
+        }).join('') + '</div>' +
+        '<p class="tiny" style="margin-top:8px">' +
+        L.map(function (v) { return esc(v.label) + '：' + esc(v.desc); }).join('<br>') + '</p>' +
+        '<button class="btn quiet sm" data-act="tryRvVoice" style="width:100%;margin-top:10px">試聽這個聲音</button>' +
+        '<button class="btn quiet sm" data-act="clearVoiceCache" style="width:100%;margin-top:8px">清空語音快取</button>' +
+        '<p class="tiny" style="margin-top:10px">聲音會依語言自動切換：繁體、簡體、英文各有一組。' +
+        '真人語音連不上時，會自動改用系統語音，不會中斷。</p>'
+      : '<p class="tiny" style="margin-top:10px">目前使用手機內建的語音。</p>') +
+      '</div>';
+    return html + block;
+  };
+})();
+</script>
+
 </body>
 </html>
