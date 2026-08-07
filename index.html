@@ -7746,6 +7746,38 @@ boot();
         : '耶穌是我的榜樣，聖經是我的準則，聖靈是我的引導。';
     TTS.stop(); setTimeout(function () { TTS.speak(demo); }, 120);
   };
+  ACTS.testVoice = function () {
+    var box = document.getElementById('rvDiag');
+    if (box) box.innerHTML = '<b>檢查中…</b>';
+    var t0 = Date.now();
+    fetch(EP, { method:'POST', headers:{ 'Content-Type':'application/json' },
+      body: JSON.stringify({ voice: voiceName(), rate: rateAttr(),
+                             sil:140, silc:140, sile:260, text:'主耶穌愛你' }) })
+      .then(function (r) {
+        var ct = r.headers.get('content-type') || '(無)';
+        return r.blob().then(function (b) {
+          var ok = r.ok && /audio/i.test(ct) && b.size > 500;
+          var msg = '<b>' + (ok ? '✅ 連線正常' : '❌ 沒有拿到音檔') + '</b><br>' +
+                    '網址：' + esc(EP) + '<br>' +
+                    'HTTP：' + r.status + ' ' + esc(r.statusText || '') + '<br>' +
+                    '型態：' + esc(ct) + '<br>' +
+                    '大小：' + b.size + ' bytes<br>' +
+                    '耗時：' + (Date.now() - t0) + ' ms<br>' +
+                    '聲音代號：' + esc(voiceName());
+          if (!ok && b.size < 3000 && !/audio/i.test(ct)) {
+            return b.text().then(function (txt) {
+              if (box) box.innerHTML = msg + '<br>回應內容：' + esc(txt.slice(0, 300));
+            });
+          }
+          if (box) box.innerHTML = msg;
+        });
+      })
+      .catch(function (e) {
+        if (box) box.innerHTML = '<b>❌ 完全連不上</b><br>網址：' + esc(EP) +
+          '<br>錯誤：' + esc(e && e.message ? e.message : String(e)) +
+          '<br>（多半是網址打錯、Worker 沒部署，或被 CORS 擋下）';
+      });
+  };
   ACTS.clearVoiceCache = function () {
     cacheClear(function (ok) { toast(ok ? '已清空語音快取' : '清除失敗，請稍後再試'); });
   };
@@ -7773,6 +7805,9 @@ boot();
         L.map(function (v) { return esc(v.label) + '：' + esc(v.desc); }).join('<br>') + '</p>' +
         '<button class="btn quiet sm" data-act="tryRvVoice" style="width:100%;margin-top:10px">試聽這個聲音</button>' +
         '<button class="btn quiet sm" data-act="clearVoiceCache" style="width:100%;margin-top:8px">清空語音快取</button>' +
+        '<button class="btn quiet sm" data-act="testVoice" style="width:100%;margin-top:8px">🔍 檢查真人語音連線</button>' +
+        '<div id="rvDiag" class="tiny" style="margin-top:10px;padding:10px;border-radius:10px;' +
+        'background:rgba(0,0,0,.05);word-break:break-all">按上面那一顆，會顯示後端實際的回應。</div>' +
         '<p class="tiny" style="margin-top:10px">聲音會依語言自動切換：繁體、簡體、英文各有一組。' +
         '真人語音連不上時，會自動改用系統語音，不會中斷。</p>'
       : '<p class="tiny" style="margin-top:10px">目前使用手機內建的語音。</p>') +
