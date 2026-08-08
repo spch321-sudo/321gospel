@@ -597,6 +597,13 @@ function walk(root) {
   catch (e) { return; }
   let n;
   while ((n = w.nextNode())) doNode(n);
+  /* TEXTAREA 被過濾器擋掉，但它的 placeholder 仍要翻譯；只碰屬性，不動使用者輸入 */
+  try {
+    if (root.nodeType === 1 && root.querySelectorAll) {
+      const ta = root.querySelectorAll('textarea');
+      for (let i = 0; i < ta.length; i++) doNode(ta[i]);
+    }
+  } catch (e) {}
 }
 
 const mo = new MutationObserver(function (ms) {
