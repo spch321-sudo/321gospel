@@ -3,7 +3,7 @@
    國度321空中團契
    每次更新內容，只要改下面這一行的版本號即可。
    ========================================================= */
-const VERSION = '4.7.1';
+const VERSION = '4.8.0';
 const CACHE = 'g321-' + VERSION;
 
 /* 預先快取：離線也要能完整使用的檔案 */
@@ -19,12 +19,6 @@ const PRECACHE = [
   './app-2d.js',
   './app-2e.js',
   './app-voice.js',
-  './data-core.json',
-  './data-faq.json',
-  './data-gospel.json',
-  './data-lessons.json',
-  './data-prayers.json',
-  './data-resources.json',
   './lang-en.json',
   './lang-enp.json',
   './lang-sc.json',
