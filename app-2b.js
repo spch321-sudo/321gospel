@@ -717,7 +717,8 @@ var va = {
   music: LS.get('gcMusic', 'none'), vol: LS.get('gcMusicVol', 0.35),
   musicSec: LS.get('gcMusicSec', 30),
   musicFile: null, musicName: '',
-  mixBlob: null, mixURL: '', busy: false
+  mixBlob: null, mixURL: '', busy: false,
+  vidBlob: null, vidURL: '', vidBusy: false, vidPct: 0
 };
 
 function noteFreq(p) {
@@ -802,6 +803,7 @@ function mmss(n) {
 function clearMix() {
   if (va.mixURL) { try { URL.revokeObjectURL(va.mixURL); } catch (e) {} }
   va.mixURL = ''; va.mixBlob = null;
+  clearVid();
 }
 
 /* ---------------- 錄音 ---------------- */
@@ -950,6 +952,113 @@ ACTS.gcVoiceSave = function () {
   document.body.appendChild(a); a.click(); a.remove();
   toast('已儲存語音檔');
 };
+
+/* ---------------- 合成影片（圖片 ＋ 聲音 ＝ 一支影片） ----------------
+   用 canvas 的畫面串流搭配混好的音軌，交給 MediaRecorder 錄成影片。
+   錄製是即時的：音樂多長就錄多久，中途請不要切走頁面。 */
+function clearVid() {
+  if (va.vidURL) { try { URL.revokeObjectURL(va.vidURL); } catch (e) {} }
+  va.vidURL = ''; va.vidBlob = null;
+}
+function vidType() {
+  var t = ['video/mp4', 'video/mp4;codecs=avc1,mp4a.40.2',
+           'video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm'];
+  for (var i = 0; i < t.length; i++) {
+    if (window.MediaRecorder && MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t[i])) return t[i];
+  }
+  return '';
+}
+function vidName() { return '321福音卡片' + (vidType().indexOf('mp4') >= 0 ? '.mp4' : '.webm'); }
+
+ACTS.gcMakeVideo = async function () {
+  if (va.vidBusy) return;
+  if (!va.mixBlob) { toast('請先按「合成有聲卡片」'); return; }
+  if (!gc.lastURL) { toast('請先做好卡片圖'); return; }
+  if (typeof MediaRecorder === 'undefined' || !vidType()) {
+    toast('這支裝置不支援合成影片，請改用分享圖片與聲音'); return;
+  }
+  va.vidBusy = true; va.vidPct = 0; clearVid(); refreshSheet();
+  var ac = null, stop = null;
+  try {
+    /* 圖片畫到 canvas（最寬 1080，兼顧畫質與速度） */
+    var img = new Image();
+    await new Promise(function (res, rej) { img.onload = res; img.onerror = rej; img.src = gc.lastURL; });
+    var W = img.naturalWidth || 1080, H = img.naturalHeight || 1080;
+    var sc = Math.min(1, 1080 / Math.max(W, H));
+    W = Math.round(W * sc / 2) * 2; H = Math.round(H * sc / 2) * 2;   /* 邊長取偶數，編碼器才不會挑剔 */
+    var cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+    var cx = cv.getContext('2d');
+    function paint() { cx.fillStyle = '#fff'; cx.fillRect(0, 0, W, H); cx.drawImage(img, 0, 0, W, H); }
+    paint();
+
+    /* 音軌：把混好的 wav 解碼後接到串流 */
+    var AC = window.AudioContext || window.webkitAudioContext;
+    ac = new AC();
+    if (ac.state === 'suspended') { try { await ac.resume(); } catch (e) {} }
+    var buf = await ac.decodeAudioData(await va.mixBlob.arrayBuffer());
+    var dest = ac.createMediaStreamDestination();
+    var src = ac.createBufferSource(); src.buffer = buf; src.connect(dest);
+
+    var vs = cv.captureStream(12);
+    var mix = new MediaStream(vs.getVideoTracks().concat(dest.stream.getAudioTracks()));
+    var chunks = [];
+    var rec = new MediaRecorder(mix, { mimeType: vidType(), videoBitsPerSecond: 1200000 });
+    rec.ondataavailable = function (ev) { if (ev.data && ev.data.size) chunks.push(ev.data); };
+
+    var total = buf.duration;
+    var t0 = Date.now();
+    var tick = setInterval(function () {
+      paint();                                     /* 持續供給畫面，串流才不會斷 */
+      va.vidPct = Math.min(99, Math.round((Date.now() - t0) / 10 / total));
+      var el = document.getElementById('gcVidPct');
+      if (el) el.textContent = va.vidPct + '%';
+    }, 200);
+
+    stop = function () {
+      clearInterval(tick);
+      try { src.stop(); } catch (e) {}
+      try { vs.getTracks().forEach(function (t) { t.stop(); }); } catch (e) {}
+      try { ac.close(); } catch (e) {}
+    };
+
+    await new Promise(function (res) {
+      rec.onstop = res;
+      rec.start(1000);
+      src.start();
+      src.onended = function () { setTimeout(function () { try { rec.stop(); } catch (e) {} }, 400); };
+      setTimeout(function () { try { rec.stop(); } catch (e) {} }, (total + 3) * 1000 + 2000);   /* 保險 */
+    });
+    stop(); stop = null;
+
+    va.vidBlob = new Blob(chunks, { type: vidType() });
+    va.vidURL = URL.createObjectURL(va.vidBlob);
+    toast('影片合成完成');
+  } catch (e) {
+    toast('合成影片失敗，請改用分享圖片與聲音');
+  }
+  if (stop) stop();
+  va.vidBusy = false; va.vidPct = 0; refreshSheet();
+};
+
+ACTS.gcShareVideo = async function () {
+  if (!va.vidBlob) { toast('請先合成影片'); return; }
+  var f = new File([va.vidBlob], vidName(), { type: va.vidBlob.type });
+  try {
+    if (navigator.canShare && navigator.canShare({ files: [f] })) {
+      await navigator.share({ files: [f], title: '321福音同行' });
+      return;
+    }
+  } catch (e) { if (e && e.name === 'AbortError') return; }
+  ACTS.gcSaveVideo();
+};
+ACTS.gcSaveVideo = function () {
+  if (!va.vidURL) { toast('請先合成影片'); return; }
+  var a = document.createElement('a');
+  a.href = va.vidURL; a.download = vidName();
+  document.body.appendChild(a); a.click(); a.remove();
+  toast('已儲存影片');
+};
+
 ACTS.gcShareAll = async function () {
   if (!va.mixURL) { toast('請先按「合成有聲卡片」'); return; }
   var c = merged();
@@ -1084,7 +1193,22 @@ function voiceCardHTML() {
       + '<div class="btn-row">'
       + '<button class="btn" data-act="gcShareAll">' + (va.voice ? '分享圖片與語音' : '分享圖片與音樂') + '</button>'
       + '<button class="btn quiet" data-act="gcVoiceSave">' + (va.voice ? '儲存語音檔' : '儲存音樂檔') + '</button>'
-      + '</div>';
+      + '</div>'
+      + '<div class="eyebrow" style="margin-top:16px">合成影片</div>'
+      + '<p class="tiny">把卡片圖和聲音做成一支影片，LINE 只要傳一則，他點開就同時看見也聽見。</p>'
+      + (va.vidBusy
+          ? '<button class="btn gold" style="width:100%;margin-top:8px" disabled>合成中… <span id="gcVidPct">'
+            + va.vidPct + '%</span></button>'
+            + '<p class="tiny" style="margin-top:6px">錄製是即時的，音樂多長就要等多久。這段時間請讓畫面停在這裡。</p>'
+          : va.vidURL
+            ? '<video src="' + va.vidURL + '" controls playsinline style="width:100%;margin-top:8px;border-radius:12px"></video>'
+              + '<div class="btn-row" style="margin-top:8px">'
+              + '<button class="btn" data-act="gcShareVideo">分享影片</button>'
+              + '<button class="btn quiet" data-act="gcSaveVideo">儲存影片</button>'
+              + '</div>'
+              + '<button class="btn quiet sm" data-act="gcMakeVideo" style="width:100%;margin-top:8px">重新合成</button>'
+            : '<button class="btn gold" data-act="gcMakeVideo" style="width:100%;margin-top:8px">🎬 合成影片</button>')
+      ;
   }
   h += '<p class="tiny" style="margin-top:12px">LINE 會分成兩則：先傳卡片圖，再傳聲音。'
     + '先傳圖片，他看見了；再傳聲音，他被記得了。</p>'
