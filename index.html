@@ -644,7 +644,7 @@ window.I18N = {
 })();
 </script>
 <script>
-const APPVER = '4.8.0';
+const APPVER = '4.8.1';
 
 /* =========================================================
    321 福音同行  ——  國度321空中團契
@@ -894,7 +894,15 @@ function closeSheet(silent) {
   if (!silent) R.stack = [];
   TTS.stop();
 }
-function refreshSheet() { if (R.stack.length) drawSheet(); }
+function refreshSheet() {
+  if (!R.stack.length) return;
+  /* 記住目前捲到哪裡，重畫完再捲回去，畫面才不會跳回最上面 */
+  const sv0 = $('#sheetView');
+  const keep = sv0 ? sv0.scrollTop : 0;
+  const p = drawSheet();
+  const back = () => { const sv1 = $('#sheetView'); if (sv1 && keep) sv1.scrollTop = keep; };
+  if (p && p.then) p.then(back).catch(back); else back();
+}
 
 /* ---------------- 事件綁定（宣告式 data-act） ---------------- */
 const ACTS = {};
@@ -937,14 +945,14 @@ window.__G = { S, saveS, DB, LS, C, STORES, $, uid, esc, nl2br, todayISO, daysSi
 
 </script>
 
-<script defer src="app-1.js?v=4.8.0"></script>
-<script defer src="app-2.js?v=4.8.0"></script>
-<script defer src="app-2a.js?v=4.8.0"></script>
-<script defer src="app-2b.js?v=4.8.0"></script>
-<script defer src="app-2c.js?v=4.8.0"></script>
-<script defer src="app-2d.js?v=4.8.0"></script>
-<script defer src="app-2e.js?v=4.8.0"></script>
-<script defer src="app-voice.js?v=4.8.0"></script>
+<script defer src="app-1.js?v=4.8.1"></script>
+<script defer src="app-2.js?v=4.8.1"></script>
+<script defer src="app-2a.js?v=4.8.1"></script>
+<script defer src="app-2b.js?v=4.8.1"></script>
+<script defer src="app-2c.js?v=4.8.1"></script>
+<script defer src="app-2d.js?v=4.8.1"></script>
+<script defer src="app-2e.js?v=4.8.1"></script>
+<script defer src="app-voice.js?v=4.8.1"></script>
 
 </body>
 </html>

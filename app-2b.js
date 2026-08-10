@@ -863,9 +863,13 @@ ACTS.gcMusicVol = function (d) { va.vol = +d.v; LS.set('gcMusicVol', va.vol); cl
 ACTS.gcMusicSec = function (d) { va.musicSec = +d.v; LS.set('gcMusicSec', va.musicSec); clearMix(); refreshSheet(); };
 ACTS.gcMusicFile = function () {
   var inp = document.createElement('input');
-  inp.type = 'file'; inp.accept = 'audio/*';
+  inp.type = 'file';
+  /* 不設 accept：iOS 的「檔案」App 若限定格式，iCloud 裡多數音檔會被藏起來 */
   inp.onchange = function () {
     var f = inp.files && inp.files[0]; if (!f) return;
+    if (f.type && f.type.indexOf('audio') < 0 && f.type.indexOf('video') < 0) {
+      toast('這不是音訊檔，請改選 m4a、mp3、wav 等檔案'); return;
+    }
     va.musicFile = f; va.musicName = f.name || '自選音樂'; va.music = 'file';
     LS.set('gcMusic', 'file'); clearMix(); refreshSheet();
     toast('已選好配樂');
