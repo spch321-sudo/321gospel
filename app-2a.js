@@ -11,6 +11,17 @@ var XZ_ENDPOINT = 'https://xiaozhi-proxy.spch321.workers.dev';
 var XZ_MODEL = 'claude-sonnet-4-6';
 
 var chat = { open: false, msgs: [], busy: false, favView: false, topic: -1, pid: '', anon: true };
+/* gx1103：回答長度、字級、全螢幕（存在本機） */
+chat.len = LS.get('xzLen', 'mid'); chat.xf = LS.get('xzXf', 1); chat.full = LS.get('xzFull', false);
+function XL(zh, en) { return (window.GXR && GXR.hl) ? GXR.hl.t(zh, en) : zh; }
+var XZ_MAXTOK = { brief: 700, mid: 1000, full: 1800 };
+var XZ_CONT = XL('請從你剛才停下的地方直接接著寫完，不要重複前面已經寫過的內容。', 'Please continue exactly where you stopped and finish; do not repeat what you already wrote.');
+function lenExtra() {
+  var k = chat.len, en = (window.I18N && window.I18N.lang) === 'en';
+  if (k === 'brief') return en ? '\n\n[Length] Keep the answer as short as possible: one-sentence conclusion, then at most 3 short points, about 120 words in all.' : '\n\n【回答長度】請把答案縮到最精簡：先給一句結論，再用至多 3 個短要點，全部約 150 字以內。';
+  if (k === 'full') return en ? '\n\n[Length] Answer fully and in detail: conclusion first, then reasons, the Scripture basis, and wording or examples I can use directly (about 500-800 words), still warm and conversational.' : '\n\n【回答長度】請完整、詳細地回答：先給結論，再分段說明理由、聖經根據，以及我可以直接使用的說法或例子（約 500 到 800 字），仍要口語、溫暖、不說教。';
+  return '';
+}
 var people = [];
 var host = null;
 
@@ -512,9 +523,30 @@ function personCtx() {
   return L.join('\n');
 }
 
-function sysPrompt() { return baseSystem() + personCtx(); }
+function sysPrompt() { return baseSystem() + personCtx() + lenExtra(); }
 
 /* ---------------- 呼叫 ---------------- */
+async function fetchOnce(msgs, ctrl) {
+  var res = await fetch(XZ_ENDPOINT, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    signal: ctrl ? ctrl.signal : undefined,
+    body: JSON.stringify({ model: XZ_MODEL, max_tokens: XZ_MAXTOK[chat.len] || 1000, system: sysPrompt(), messages: msgs })
+  });
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  var data = await res.json();
+  return { t: (data.content || []).filter(function (b) { return b.type === 'text'; }).map(function (b) { return b.text; }).join('\n').trim(), sr: data.stop_reason };
+}
+async function contLast() {
+  var m = chat.msgs[chat.msgs.length - 1];
+  if (!m || m.role !== 'assistant' || chat.busy) return;
+  chat.busy = true; draw(); toBottom();
+  try {
+    var base = chat.msgs.map(function (x) { return { role: x.role, content: x.text }; });
+    var r = await fetchOnce(base.concat([{ role: 'user', content: XZ_CONT }]));
+    m.text += r.t; m.cut = r.sr === 'max_tokens';
+  } catch (e) { toast(XL('小智暫時連不上線，請稍後再試', 'Xiaozhi cannot connect right now')); }
+  chat.busy = false; draw(); toBottom();
+}
 async function call() {
   chat.busy = true; draw(); toBottom();
   if (typeof navigator !== 'undefined' && navigator.onLine === false) {
@@ -524,22 +556,17 @@ async function call() {
   var ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
   var timer = ctrl ? setTimeout(function () { try { ctrl.abort(); } catch (e) {} }, 40000) : null;
   try {
-    var res = await fetch(XZ_ENDPOINT, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      signal: ctrl ? ctrl.signal : undefined,
-      body: JSON.stringify({
-        model: XZ_MODEL, max_tokens: 1000,
-        system: sysPrompt(),
-        messages: chat.msgs.map(function (m) { return { role: m.role, content: m.text }; })
-      })
-    });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    var data = await res.json();
-    var text = (data.content || []).filter(function (b) { return b.type === 'text'; })
-      .map(function (b) { return b.text; }).join('\n').trim();
+    var base = chat.msgs.map(function (m) { return { role: m.role, content: m.text }; });
+    var r1 = await fetchOnce(base, ctrl), text = r1.t, sr = r1.sr, more = 0;
+    while (sr === 'max_tokens' && text && more < 2) {
+      more++;
+      if (timer) clearTimeout(timer);
+      timer = ctrl ? setTimeout(function () { try { ctrl.abort(); } catch (e) {} }, 40000) : null;
+      var rn = await fetchOnce(base.concat([{ role: 'assistant', content: text }, { role: 'user', content: XZ_CONT }]), ctrl);
+      text += rn.t; sr = rn.sr;
+    }
     if (!text) text = '小智一時想不出合適的話，但神的話永不落空。要不要換個方式再問一次？';
-    chat.msgs.push({ role: 'assistant', text: text });
+    chat.msgs.push({ role: 'assistant', text: text, cut: sr === 'max_tokens' });
   } catch (e) {
     var aborted = e && e.name === 'AbortError';
     chat.msgs.push({ role: 'assistant', text: (aborted ? '小智等候得有點久，先暫停一下 🙏 請稍後再試。' : '小智暫時連不上線，請稍後再試 🙏') + '\n別忘了——使人重生的是聖靈，不是我們。你現在就可以為他禱告一分鐘。' });
@@ -604,6 +631,29 @@ function favsHTML() {
   return h;
 }
 
+var XZ_FU = [
+  ['再說得簡單一點，讓我可以直接講給他聽', 'Say it more simply so I can tell him directly'],
+  ['給我一個生活化的例子', 'Give me an everyday example'],
+  ['幫我擬成一則可以傳給他的訊息', 'Draft this as a message I can send him'],
+  ['為這件事寫一段簡短的禱告', 'Write a short prayer for this']
+];
+function fuHTML() {
+  var l = chat.msgs[chat.msgs.length - 1];
+  if (chat.busy || !l || l.role !== 'assistant' || l.col || l.cut || /^目前似乎沒有網路|^小智暫時連不上線|^小智等候得有點久/.test(l.text || '')) return '';
+  return '<div class="xz-fu"><span class="lb">' + XL('追問', 'Follow up') + '</span>' + XZ_FU.map(function (f, j) {
+    return '<button data-xz="fu" data-j="' + j + '">' + esc(XL(f[0], f[1])) + '</button>';
+  }).join('') + '</div>';
+}
+function toolsBar() {
+  var L = { brief: ['簡要', 'Short'], mid: ['適中', 'Medium'], full: ['詳細', 'Detailed'] };
+  return '<div class="xz-who xz-tools"><span class="lb">' + XL('回答長度', 'Length') + '</span>'
+    + ['brief', 'mid', 'full'].map(function (k) {
+      return '<button class="xz-wchip" aria-pressed="' + (chat.len === k) + '" data-xz="len" data-k="' + k + '">' + XL(L[k][0], L[k][1]) + '</button>';
+    }).join('')
+    + '<button class="xz-wchip" data-xz="fs" aria-label="' + XL('字級', 'Text size') + '">A</button>'
+    + '<button class="xz-wchip" data-xz="full" aria-pressed="' + (!!chat.full) + '" aria-label="' + XL('全螢幕', 'Full screen') + '">⛶</button></div>';
+}
+
 function draw() {
   if (!host) return;
   var h = '<button class="xz-fab" data-xz="open"><span class="ic">✨</span>小智</button>';
@@ -621,8 +671,16 @@ function draw() {
         } else {
           var q = (i > 0 && chat.msgs[i - 1] && chat.msgs[i - 1].role === 'user') ? chat.msgs[i - 1].text : '';
           var on = isFav(q, m.text);
+          if (m.col) {
+            var sm = String(m.text || '').replace(/\s+/g, ' ');
+            body += '<div class="xz-msg"><div class="xz-bub xz-colb"><span class="xz-sum">' + esc(sm.length > 48 ? sm.slice(0, 48) + '…' : sm) + '</span>'
+              + '<div class="xz-acts"><button class="xz-act" data-xz="tog" data-i="' + i + '">' + XL('▾ 展開', '▾ Expand') + '</button></div></div></div>';
+            return;
+          }
           body += '<div class="xz-msg"><div class="xz-bub">' + fmt(m.text)
             + '<div class="xz-acts">'
+            + (m.cut ? '<button class="xz-act on" data-xz="cont" data-i="' + i + '">' + XL('▶ 繼續寫完', '▶ Continue') + '</button>' : '')
+            + (i < chat.msgs.length - 1 ? '<button class="xz-act" data-xz="tog" data-i="' + i + '">' + XL('▴ 收合', '▴ Fold') + '</button>' : '')
             + '<button class="xz-act" data-xz="speak" data-i="' + i + '">🔊 朗讀</button>'
             + '<button class="xz-act" data-xz="copy" data-i="' + i + '">📋 複製</button>'
             + '<button class="xz-act' + (on ? ' on' : '') + '" data-xz="fav" data-i="' + i + '">' + (on ? '★ 已收藏' : '☆ 收藏') + '</button>'
@@ -631,6 +689,7 @@ function draw() {
         }
       });
       if (chat.busy) body += '<div class="xz-msg"><div class="xz-bub xz-typing"><span></span><span></span><span></span></div></div>';
+      body += fuHTML();
       if (!chat.msgs.length) {
         body += '<div class="xz-lb">先從這裡開始</div><div class="xz-quicks">'
           + quicks().map(function (q, i) { return '<button class="xz-quick" data-xz="quick" data-i="' + i + '">' + esc(q) + '</button>'; }).join('')
@@ -639,13 +698,13 @@ function draw() {
         body += '<div class="xz-sep">· 前面的問答都保留著 ·</div>' + picker('換個需要．回這裡繼續發問');
       }
     }
-    h += '<div class="xz-overlay" data-xz="bg"><div class="xz-sheet">'
+    h += '<div class="xz-overlay" data-xz="bg" style="--xzf:' + (+chat.xf || 1) + '"><div class="xz-sheet' + (chat.full ? ' full' : '') + '">'
       + '<div class="xz-head"><span class="ava">✨</span><div class="grow"><div class="nm">小智</div>'
       + '<div class="rl">傳福音的屬靈同伴 · 陪你把人帶到耶穌面前</div></div>'
       + '<button class="xz-hbtn" data-xz="favs" aria-label="收藏">⭐</button>'
       + '<button class="xz-hbtn" data-xz="clear" aria-label="重新開始">🏠</button>'
       + '<button class="xz-hbtn" data-xz="close" aria-label="關閉">✕</button></div>'
-      + whoBar()
+      + whoBar() + toolsBar()
       + '<div class="xz-msgs" id="xz-msgs">' + body + '</div>'
       + '<div class="xz-foot"><input id="xz-in" class="xz-input" type="text" placeholder="向小智提問…" '
       + 'onkeydown="if(event.key===\'Enter\')window.__xzSend()"><button class="xz-send" data-xz="send">送出</button></div>'
@@ -662,6 +721,7 @@ function send(t) {
   if (chat.busy) return;
   t = (t || '').trim(); if (!t) return;
   chat.favView = false; chat.topic = -1;
+  chat.msgs.forEach(function (m) { if (m.role === 'assistant') m.col = true; });
   chat.msgs.push({ role: 'user', text: t });
   draw(); toBottom(); call();
 }
@@ -735,6 +795,12 @@ document.addEventListener('click', function (ev) {
   else if (a === 'cat') { chat.topic = (chat.topic === i ? -1 : i); draw(); var q = document.getElementById('xz-topicqs'); if (q && q.scrollIntoView) q.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
   else if (a === 'ask') { var t = XZ_TOPICS[i] && XZ_TOPICS[i].qs[j]; if (t) send(t); }
   else if (a === 'quick') { send(quicks()[i]); }
+  else if (a === 'len') { chat.len = el.dataset.k; LS.set('xzLen', chat.len); draw(); toast(XL('下一個問題起，會照這個長度回答', 'The next answer will use this length')); }
+  else if (a === 'fs') { var FS = [1, 1.15, 1.3, 0.9], fi = FS.indexOf(+chat.xf); chat.xf = FS[(fi + 1) % FS.length]; LS.set('xzXf', chat.xf); draw(); }
+  else if (a === 'full') { chat.full = !chat.full; LS.set('xzFull', chat.full); draw(); }
+  else if (a === 'tog') { var mt = chat.msgs[i]; if (mt) { mt.col = !mt.col; draw(); } }
+  else if (a === 'cont') { contLast(); }
+  else if (a === 'fu') { var fq = XZ_FU[j]; if (fq) send(XL(fq[0], fq[1])); }
   else if (a === 'speak') { TTS.speak(window.__xzText(i)); }
   else if (a === 'speakfav') { TTS.speak(window.__xzFavText(i)); }
   else if (a === 'copy') { copyText(window.__xzText(i)); }
@@ -808,6 +874,8 @@ function wireFab() {
 
 /* ---------------- 接進工具頁與個人卡 ---------------- */
 ACTS.openXiaozhi = function () { open(); };
+/* 供畫線面板「問小智」使用 */
+window.__xzAsk = async function (t) { await open(); send(t); };
 ACTS.xzAskPerson = function (d) { open(d.id); };
 
 var _tools = VIEWS.tools;

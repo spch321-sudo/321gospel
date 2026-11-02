@@ -174,6 +174,7 @@
     rv.token++; rv.active = false; rv.queue = []; rv.idx = 0;
     if (rv.audio) { try { rv.audio.pause(); } catch (e) {} rv.audio.onended = null; rv.audio.onerror = null; }
     try { if (navigator.mediaSession) navigator.mediaSession.playbackState = 'none'; } catch (e) {}
+    if (window.GXR) { GXR.ttsState(''); }
   }
 
   /* 某一段抓不到，就用系統語音把這一段補完，唸完再接下一段 */
@@ -190,7 +191,7 @@
 
   function rvSpeak(text) {
     unlock();
-    var q = chunks(text);
+    var q = chunks(window.GXR ? GXR.pron(text) : text);
     if (!q.length) { toast('這一頁沒有可朗讀的內容'); return; }
     rv.queue = q; rv.idx = 0; rv.active = true;
     var my = ++rv.token, a = audio();
@@ -229,15 +230,26 @@
   /* ---- 接到原本的朗讀鈕上：所有「🔊 朗讀」自動改用真人聲音 ---- */
 
 
-  TTS.stop = function () { rvStop(); origStop(); };
+  TTS.stop = function () { rvStop(); origStop(); if (window.GXR) { GXR.ttsState(''); } };
   TTS.speak = function (text) {
     if (rv.active || TTS.speaking) { TTS.stop(); toast('已停止朗讀'); return; }
+    if (window.GXR) { text = GXR.pre(text); }
     if (on() && /^https?:\/\//i.test(EP)) rvSpeak(text);
     else origSpeak(text);
+    if (window.GXR && (rv.active || TTS.speaking)) { GXR.ttsState('playing'); }
+  };
+  /* GXR 橋接：背景播放的暫停／繼續／停止、鎖定畫面控制 */
+  window.GXR_BR = {
+    audio: function () { return rv.audio; },
+    voice: function () { return voiceName(); },
+    title: function () { try { var t = G.R.stack[G.R.stack.length - 1]; return t && t.title || ''; } catch (e) { return ''; } },
+    pause: function () { try { if (rv.audio && !rv.audio.paused) { rv.audio.pause(); } if ('speechSynthesis' in window && speechSynthesis.speaking) { speechSynthesis.pause(); } } catch (e) {} },
+    resume: function () { try { if (rv.audio && rv.audio.paused && rv.audio.src && rv.active) { var p = rv.audio.play(); if (p && p.then) { p.then(null, function () {}); } } if ('speechSynthesis' in window && speechSynthesis.paused) { speechSynthesis.resume(); } } catch (e) {} },
+    stop: function () { TTS.stop(); }
   };
   window.__rvClearCache = cacheClear;
 
-  document.addEventListener('visibilitychange', function () { if (document.hidden) rvStop(); });
+  /* gx1103：切到背景或鎖定畫面時不再中斷朗讀（真人語音是 <audio>，可以在背景繼續播） */
 
   /* ---- 設定頁：真人語音開關與聲音選擇 ---- */
   ACTS.setRealVoice = function (d) { LS.set('rvOn', d.v === '1'); TTS.stop(); refreshSheet(); };

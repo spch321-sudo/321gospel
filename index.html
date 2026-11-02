@@ -338,6 +338,14 @@ hr.sep{border:0;border-top:1px solid var(--line);margin:18px 0}
   color:inherit;font-size:calc(18px * var(--fs));display:flex;align-items:center;justify-content:center
 }
 
+.xz-sheet.full{height:100dvh;max-width:none;border-radius:0}
+.xz-tools{padding:8px 12px}
+.xz-colb .xz-sum{display:block;color:var(--ink-2);font-size:calc(16px * var(--fs) * var(--xzf,1));line-height:1.7}
+.xz-colb{opacity:.92}
+.xz-fu{display:flex;flex-wrap:wrap;gap:8px;margin:2px 0 12px}
+.xz-fu .lb{font-size:calc(14px * var(--fs));color:var(--ink-2);font-weight:700;align-self:center}
+.xz-fu button{padding:7px 12px;border-radius:999px;border:1px solid var(--line);background:var(--card);font-size:calc(15px * var(--fs));font-weight:600;color:var(--ink-2);max-width:100%;text-align:left}
+#gxrBar{max-width:calc(100vw - 20px)}
 .xz-who{
   display:flex;align-items:center;gap:8px;overflow-x:auto;
   padding:10px 12px;background:var(--soft);border-bottom:1px solid var(--line);flex:0 0 auto
@@ -356,7 +364,7 @@ hr.sep{border:0;border-top:1px solid var(--line);margin:18px 0}
 .xz-msg.me{justify-content:flex-end}
 .xz-bub{
   max-width:88%;padding:13px 15px;border-radius:14px;
-  font-size:calc(18px * var(--fs));line-height:1.9;
+  font-size:calc(18px * var(--fs) * var(--xzf,1));line-height:1.9;
   background:var(--card);border:1px solid var(--line);color:var(--ink)
 }
 .xz-msg.me .xz-bub{background:var(--navy);color:#fff;border-color:var(--navy)}
@@ -644,7 +652,7 @@ window.I18N = {
 })();
 </script>
 <script>
-const APPVER = '4.9.0';
+const APPVER = '4.9.2-k3m-vp1023-gx1103-co1';
 
 /* =========================================================
    321 福音同行  ——  國度321空中團契
@@ -945,14 +953,15 @@ window.__G = { S, saveS, DB, LS, C, STORES, $, uid, esc, nl2br, todayISO, daysSi
 
 </script>
 
-<script defer src="app-1.js?v=4.9.0"></script>
-<script defer src="app-2.js?v=4.9.0"></script>
-<script defer src="app-2a.js?v=4.9.0"></script>
-<script defer src="app-2b.js?v=4.9.0"></script>
-<script defer src="app-2c.js?v=4.9.0"></script>
-<script defer src="app-2d.js?v=4.9.0"></script>
-<script defer src="app-2e.js?v=4.9.0"></script>
-<script defer src="app-voice.js?v=4.9.0"></script>
+<script defer src="app-1.js?v=4.9.2-k3m-vp1023-gx1103-co1"></script>
+<script defer src="app-2.js?v=4.9.2-k3m-vp1023-gx1103-co1"></script>
+<script defer src="app-2a.js?v=4.9.2-k3m-vp1023-gx1103-co1"></script>
+<script defer src="app-2b.js?v=4.9.2-k3m-vp1023-gx1103-co1"></script>
+<script defer src="app-2c.js?v=4.9.2-k3m-vp1023-gx1103-co1"></script>
+<script defer src="app-2d.js?v=4.9.2-k3m-vp1023-gx1103-co1"></script>
+<script defer src="app-2e.js?v=4.9.2-k3m-vp1023-gx1103-co1"></script>
+<script defer src="app-voice.js?v=4.9.2-k3m-vp1023-gx1103-co1"></script>
+<script defer src="app-gx.js?v=4.9.2-k3m-vp1023-gx1103-co1"></script>
 
 <script id="gxuScript">/* ===== GXU 美圖工作室（獨立版，v1.3.202610201200）：不依賴本 App 的內部結構，自帶狀態、我的作品與入口 ===== */
 (function () {
@@ -3476,6 +3485,472 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
 })();
 </script>
 
+<script id="gxrScript">
+window.GXR_CFG={"key": "gospel", "app": "321福音同行", "appEn": "321 Gospel Companion"};
+window.GXR_SCM={"m":["丟並乾亂亙亞佈佔併來係俱倉個們倖倫偉側偽備傢傳債傷傾僅僑僕僥價儀儘償優儲兇兌兒內兩冊冪凱別刪則剛剝創劃劇劍勁動務勝勞勢勳勵勸匯區協卻厭厲參叢呂員唸問啞啟喚喪單嗎嘆嘗噚噴嚀嚇嚥嚨嚮嚴囉囑國圍園圓圖團執堅報場塊塗塵墜墮墳壇壓壞壯壺壽夠夢夥夾奧奪奮姊姦姪娛婦媽嬤嬰孫學宮寢實寧審寫寬寶將專尋對導尷屍屜屢層屬岡島峽崗崙嶺師帳帶幣幫幹幾庫廂廚廟廠廢廣廳張強彆彈彌彎彙彷彿後徑從復徵徹恆恥悅悶惡惱愛態慘慚慟慣慮慶憂憊憐憑憤憫憶懇應懲懶懷懸懺懼戀戰戲戶拋挾捨捲掃掙掛採揀揚換揮損搖搗搶摀摺撈撐撥撫撲撿擁擄擇擊擋擔據擠擬擱擴擺擾攆攏攔攤攪攬敗敘敵數斂斃斷於時晝暈暢暫暱曆曉曠曬書會東條棄棟業極榮構槍槤槳樁樂樓標樞樣樸樹橋機橫檔檢檯檻櫃欄權欖欽歎歐歡歲歷歸殘殮殯殺殼毀氣汙決沒沖況洩涼淚淨淪淵淺減測渾湊湧準溝溫滅滲滿漁漸潑潔潤潰澆濃濕濟濫濾瀆瀕灑灘灣災為烏無煉煙煩熱燈燒燙營燭爐爛爭爾牆牽犢犧狀狹狽猶獄獅獎獨獲獵獸獻現瑪環甚產畢畫異當疊瘋瘓療癇癒癢癮癱癲發盜盞盡監盤眾睜瞞確碼磚磯礎礙祕祿禍禪禮禱稅稜稟種稱穌積穢穩窮窯窺竄竅竊競筆節範築篤篩簡簷簽簾籃籌籠籤籲粵糧糾紀約紅納紐純紙級紛紮細紹終組絆結絕絡給統絲綁經綠維綱網綴綻綽綿緊緒線緣編緩緬練緻縋縫縮縱總績繃織繞繩繪繫繭繳繸繼續纏纜罰罵羅羈羨義習聖聞聯聰聲聳職聽肅脅脈脫脹腎腦腫腳腸膚膠膽臉臘臟臥臨臺與興舉舊艱荊莊華萬著蒐蓆蓋蓮蔭蕩薦薩藉藍藝藥蘇蘭處虛號虧蛻蝕螢蟲蠍蠻術衛衝裏補裝裡製複褻見規視親覺覽觀觸訂計訊討訓託記訝訟訪設許訴診註詐詔評詛詞詢試詩詭詮話該詳誇誌認誕誘誚語誠誡誣誤誦說誰課誼調諂談諉請諒論諦諭諮諱諷諸諾謀謂謊謎謗謙講謝謠謨謬謹證譏識譯議護讀變讓讚讞豈豎豐豬貝負財貧貨販貪貫責貴貶買費貼賂賄資賑賓賙賜賞賠賢賣賤賦質賭賴賺購賽贅贊贏贖趕跡跤踐蹟蹤躍躪車軌軍軛軟軸較載輒輔輕輛輟輩輪輯輸轄轉轍轟辦辭辯農迴這連週進遊運過達違遙遞遠適遲遷選遺還邊邏鄉鄭鄰醜醫釀釋釐釘針釣鈍鈕鉛銀銅銘銜銳銷鋒鋪鋸錄錘錢錨錯錶鍊鍋鍛鍵鎖鎮鏈鏡鐘鐵鑑鑒鑰鑿長門閃閉開閒間閘閡閱閹闆闖關陣陰陳陸陽隊階隕際隨險隱隸隻雖雙雛雜雞離難雲電霧靈靜鞏韻響頁頂項順須頌預頑頒頓領頭頸頻顆題額顏願顛類顧顫顯風颱颳颶飄飛飢飯飲飽飾餅養餌餓餘館餵饑饒馬馴駁駐駕駛騎騙騰騷驅驕驗驚驟驢髒體髮鬆鬥鬧鬨鬮鬱魚魯鮮鱗鳥鳩鳴鴿鶴鹽麗麥麵麼黃點黨齊齋齒齡齣龐龕","丢并干乱亘亚布占并来系具仓个们幸伦伟侧伪备家传债伤倾仅侨仆侥价仪尽偿优储凶兑儿内两册幂凯别删则刚剥创划剧剑劲动务胜劳势勋励劝汇区协却厌厉参丛吕员念问哑启唤丧单吗叹尝㖊喷咛吓咽咙向严啰嘱国围园圆图团执坚报场块涂尘坠堕坟坛压坏壮壶寿够梦伙夹奥夺奋姐奸侄娱妇妈嬷婴孙学宫寝实宁审写宽宝将专寻对导尴尸屉屡层属冈岛峡岗仑岭师帐带币帮干几库厢厨庙厂废广厅张强别弹弥弯汇仿佛后径从复征彻恒耻悦闷恶恼爱态惨惭恸惯虑庆忧惫怜凭愤悯忆恳应惩懒怀悬忏惧恋战戏户抛挟舍卷扫挣挂采拣扬换挥损摇捣抢捂折捞撑拨抚扑捡拥掳择击挡担据挤拟搁扩摆扰撵拢拦摊搅揽败叙敌数敛毙断于时昼晕畅暂昵历晓旷晒书会东条弃栋业极荣构枪梿桨桩乐楼标枢样朴树桥机横档检台槛柜栏权榄钦叹欧欢岁历归残殓殡杀壳毁气污决没冲况泄凉泪净沦渊浅减测浑凑涌准沟温灭渗满渔渐泼洁润溃浇浓湿济滥滤渎濒洒滩湾灾为乌无炼烟烦热灯烧烫营烛炉烂争尔墙牵犊牺状狭狈犹狱狮奖独获猎兽献现玛环什产毕画异当叠疯痪疗痫愈痒瘾瘫癫发盗盏尽监盘众睁瞒确码砖矶础碍秘禄祸禅礼祷税棱禀种称稣积秽稳穷窑窥窜窍窃竞笔节范筑笃筛简檐签帘篮筹笼签吁粤粮纠纪约红纳纽纯纸级纷扎细绍终组绊结绝络给统丝绑经绿维纲网缀绽绰绵紧绪线缘编缓缅练致缒缝缩纵总绩绷织绕绳绘系茧缴䍁继续缠缆罚骂罗羁羡义习圣闻联聪声耸职听肃胁脉脱胀肾脑肿脚肠肤胶胆脸腊脏卧临台与兴举旧艰荆庄华万着搜席盖莲荫荡荐萨借蓝艺药苏兰处虚号亏蜕蚀荧虫蝎蛮术卫冲里补装里制复亵见规视亲觉览观触订计讯讨训托记讶讼访设许诉诊注诈诏评诅词询试诗诡诠话该详夸志认诞诱诮语诚诫诬误诵说谁课谊调谄谈诿请谅论谛谕谘讳讽诸诺谋谓谎谜谤谦讲谢谣谟谬谨证讥识译议护读变让赞谳岂竖丰猪贝负财贫货贩贪贯责贵贬买费贴赂贿资赈宾赒赐赏赔贤卖贱赋质赌赖赚购赛赘赞赢赎赶迹交践迹踪跃躏车轨军轭软轴较载辄辅轻辆辍辈轮辑输辖转辙轰办辞辩农回这连周进游运过达违遥递远适迟迁选遗还边逻乡郑邻丑医酿释厘钉针钓钝钮铅银铜铭衔锐销锋铺锯录锤钱锚错表链锅锻键锁镇链镜钟铁鉴鉴钥凿长门闪闭开闲间闸阂阅阉板闯关阵阴陈陆阳队阶陨际随险隐隶只虽双雏杂鸡离难云电雾灵静巩韵响页顶项顺须颂预顽颁顿领头颈频颗题额颜愿颠类顾颤显风台刮飓飘飞饥饭饮饱饰饼养饵饿余馆喂饥饶马驯驳驻驾驶骑骗腾骚驱骄验惊骤驴脏体发松斗闹哄阄郁鱼鲁鲜鳞鸟鸠鸣鸽鹤盐丽麦面么黄点党齐斋齿龄出庞龛"],"p":[["份子","分子"],["察考","查考"],["甚多","甚多"],["甚好","甚好"],["甚微","甚微"],["甚急","甚急"],["甚懼","甚惧"],["甚戰","甚战"],["甚是","甚是"],["甚歡","甚欢"],["甚納","甚纳"],["甚至","甚至"],["甚覺","甚觉"],["甚迫","甚迫"],["甚遠","甚远"],["甚驚","甚惊"],["畫→","划→"],["畫、","划、"],["畫。</p","划。</p"],["畫。<s","划。<s"],["畫。主","划。主"],["畫。你","划。你"],["畫。可","划。可"],["畫。最","划。最"],["畫。那","划。那"],["畫」","划」"],["畫一","划一"],["畫不","划不"],["畫中","划中"],["畫交","划交"],["畫似","划似"],["畫出了錯","划出了错"],["畫出錯","划出错"],["畫原","划原"],["畫地","划地"],["畫就","划就"],["畫已","划已"],["畫後面","划后面"],["畫怎","划怎"],["畫把","划把"],["畫排","划排"],["畫換","划换"],["畫放在主","划放在主"],["畫放在天","划放在天"],["畫放在神","划放在神"],["畫早","划早"],["畫是","划是"],["畫時愛","划时爱"],["畫本","划本"],["畫比","划比"],["畫沒","划没"],["畫清","划清"],["畫的「","划的「"],["畫的主","划的主"],["畫的字","划的字"],["畫的宣","划的宣"],["畫而","划而"],["畫背","划背"],["畫與","划与"],["畫蓋","划盖"],["畫被","划被"],["畫裡「","划里「"],["畫裡不","划里不"],["畫裡他","划里他"],["畫裡已","划里已"],["畫裡有","划里有"],["畫裡沒","划里没"],["畫裡的","划里的"],["畫裡算","划里算"],["畫裡還","划里还"],["畫裡，「","划里，「"],["畫裡，他","划里，他"],["畫要","划要"],["畫都","划都"],["畫開","划开"],["畫）","划）"],["畫，不要","划，不要"],["畫，也","划，也"],["畫，你","划，你"],["畫，先","划，先"],["畫，反","划，反"],["畫，只","划，只"],["畫，在","划，在"],["畫，就","划，就"],["畫，是","划，是"],["畫，被","划，被"],["畫，請","划，请"],["畫，還","划，还"],["畫：主","划：主"],["畫；","划；"],["異、鍊","异、炼"],["著」，各","著」，各"],["著作","著作"],["著名","著名"],["著文","著文"],["著書","著书"],["著有","著有"],["著稱","著称"],["藉）","藉）"],["計畫","计划"],["鍊、仍","炼、仍"],["鍊。」","炼。」"],["鍊。一","炼。一"],["鍊。下","炼。下"],["鍊。主","炼。主"],["鍊。他","炼。他"],["鍊。全","炼。全"],["鍊。這","炼。这"],["鍊」","炼」"],["鍊上","炼上"],["鍊中仍","炼中仍"],["鍊也","炼也"],["鍊住","炼住"],["鍊來","炼来"],["鍊對","炼对"],["鍊少","炼少"],["鍊就會","炼就会"],["鍊捆著、","炼捆着、"],["鍊旁","炼旁"],["鍊沒","炼没"],["鍊的。","炼的。"],["鍊的人","炼的人"],["鍊的使","炼的使"],["鍊的囚","炼的囚"],["鍊的弟","炼的弟"],["鍊的形","炼的形"],["鍊的手","炼的手"],["鍊的方","炼的方"],["鍊的見","炼的见"],["鍊的解","炼的解"],["鍊而","炼而"],["鍊裡","炼里"],["鍊解","炼解"],["鍊講","炼讲"],["鍊還","炼还"],["鍊都","炼都"],["鍊開","炼开"],["鍊鬆","炼松"],["鍊，主","炼，主"],["鍊，他","炼，他"],["鍊，卻","炼，却"],["鍊，同","炼，同"],["鍊，就是","炼，就是"],["鍊：","炼："],["鍊；保","炼；保"],["鍊；或","炼；或"],["鎖鍊","锁炼"]]};
+/* ═══════════════════════════════════════════════════════════════════
+   GXR · 321 互動聖經標準補件 v1（B 組：萬象見神與早期製作的 App）
+   不改動各 App 原有結構，只補上互動聖經標準裡缺的功能：
+   ① 畫線面板：整節／整段、🖼 做成美圖、複製、分享、朗讀這句、從這句朗讀
+   ② 小智：十種回答對象、回答長度（切換＝重新回答）、追問、範例問題跟著對象換、字級鈕
+   ③ 朗讀：多音字修正（PRON321）、括號出處與表情符號不唸、背景播放（Media Session＋螢幕不休眠）、浮動控制列
+   ④ 美圖工作室與我的作品入口、小智設定卡（我的／設定頁）
+   各 App 只要在自己的程式裡留幾個掛點（window.GXR_BR 橋接），其餘都在這裡。
+   ═══════════════════════════════════════════════════════════════════ */
+(function () {
+  'use strict';
+  if (window.GXR) return;
+  var CFG = window.GXR_CFG || {};
+  var D = window.GXR_DATA || null;
+  var SCM = window.GXR_SCM || null;
+  var HL = String(document.documentElement.getAttribute('lang') || '').toLowerCase();
+  var EN = /^en/.test(HL), SC = /hans|zh-cn|zh-sg/.test(HL);
+
+  /* ── 簡體轉換（只有簡體入口頁用得到） ── */
+  var SC_M = {}, SC_P = {}, SC_H = {}, SC_L = [];
+  if (SC && SCM) {
+    (function () {
+      var tc = SCM.m[0], sc = SCM.m[1], i, Ls = {};
+      for (i = 0; i < tc.length; i++) SC_M[tc[i]] = sc[i];
+      (SCM.p || []).forEach(function (pr) { SC_P[pr[0]] = pr[1]; Ls[pr[0].length] = 1; SC_H[pr[0][0]] = 1; });
+      SC_L = Object.keys(Ls).map(Number).sort(function (a, b) { return b - a; });
+    })();
+  }
+  function toSC(s) {
+    s = String(s == null ? '' : s);
+    if (!SC || !SCM) return s;
+    var out = '', i = 0, n = s.length, c, hit, k, r;
+    while (i < n) {
+      c = s.charAt(i);
+      if (SC_H[c]) {
+        hit = false;
+        for (k = 0; k < SC_L.length; k++) { r = SC_P[s.substr(i, SC_L[k])]; if (r !== undefined) { out += r; i += SC_L[k]; hit = true; break; } }
+        if (hit) continue;
+      }
+      r = SC_M[c]; out += (r === undefined ? c : r); i++;
+    }
+    return out;
+  }
+  function T(zh, en) { return EN ? (en == null ? zh : en) : toSC(zh); }
+  function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+  function q1(s, r) { return (r || document).querySelector(s); }
+  function qa(s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
+  function BR() { return window.GXR_BR || {}; }
+  function APP() { return EN ? (CFG.appEn || CFG.app || '') : (CFG.app || ''); }
+
+  /* ── 設定（自己存，不動 App 原有資料） ── */
+  var KEY = 'gxr_' + (CFG.key || 'app');
+  var ST = { aud: 'adult', len: 'mid' };
+  try { var o = JSON.parse(localStorage.getItem(KEY) || '{}'); if (o && typeof o === 'object') { if (o.aud) ST.aud = o.aud; if (o.len) ST.len = o.len; } } catch (e) {}
+  function saveST() { try { localStorage.setItem(KEY, JSON.stringify(ST)); } catch (e) {} }
+
+  var toastT = 0;
+  function toast(m, ms) {
+    var el = q1('#gxrToast');
+    if (!el) { el = document.createElement('div'); el.id = 'gxrToast'; document.body.appendChild(el); }
+    el.textContent = m; el.className = 'on';
+    clearTimeout(toastT); toastT = setTimeout(function () { el.className = ''; }, ms || 2200);
+  }
+
+  /* ══════════ 回答對象與長度 ══════════ */
+  var KEYS = D ? D.keys : [];
+  function aud() { return KEYS.indexOf(ST.aud) >= 0 ? ST.aud : 'adult'; }
+  function alen() { return ['brief', 'mid', 'full'].indexOf(ST.len) >= 0 ? ST.len : 'mid'; }
+  function A() { return D.aud[aud()] || { sys: '', q: [], fu: [] }; }
+  function sysExtra() {
+    if (!D) return '';
+    var s = (EN ? '\n\n[Audience]' : '\n\n【回答對象】') + A().sys, k = alen();
+    if (k !== 'mid') {
+      s += (EN ? '\n\n[Length]' : '\n\n【回答長度】') + D.len[k] +
+        (EN ? ' (This length request overrides any earlier instruction about length; still follow the answer-format rules above.)'
+          : '（這一條長度要求優先於上面其他關於篇幅的原則；仍然照上面的「回答格式」排版。）');
+    }
+    if (SC) s += '\n\n【語言】這位讀者使用简体中文，請一律用简体中文回答。';
+    return s;
+  }
+  function audBtns() {
+    return KEYS.map(function (k) {
+      return '<button type="button" class="gxa' + (aud() === k ? ' on' : '') + '" data-gxr-aud="' + k + '">' + D.icon[k] + ' ' + esc(T(D.names[k], D.names[k])) + '</button>';
+    }).join('');
+  }
+  function lenBtns(cls) {
+    var L = alen();
+    return ['brief', 'mid', 'full'].map(function (x) {
+      return '<button type="button" class="' + (cls || '') + (L === x ? ' on' : '') + '" data-gxr-len="' + x + '">' + esc(T(D.lenNames[x], D.lenNames[x])) + '</button>';
+    }).join('');
+  }
+  var audOpen = false;
+  function ctlHTML() {
+    var k = aud(), b = BR(), fsOn = typeof b.setFs === 'function';
+    return '<div class="gxrow"><button type="button" class="gxsm" data-gxr-togaud="1">' + D.icon[k] + ' ' + esc(T('對象：', 'For: ') + T(D.names[k], D.names[k])) + ' ' + (audOpen ? '▴' : '▾') + '</button>' +
+      (fsOn ? '<button type="button" class="gxsm gxfs" data-gxr-fs="1" aria-label="' + esc(T('字級', 'Text size')) + '">A</button>' : '') + '</div>' +
+      '<div class="gxrow" style="margin-top:6px"><span class="gxlen"><span class="gxlab">' + esc(T('長度', 'Length')) + '</span>' + lenBtns('') + '</span></div>' +
+      (audOpen ? '<div class="gxaud">' + audBtns() + '</div><p class="gxhint">' + esc(T(D.hints[k], D.hints[k])) + '</p>' : '');
+  }
+  function paintCtl() {
+    qa('#gxrCtl').forEach(function (el) { el.innerHTML = ctlHTML(); });
+    qa('.gxr-me-aud').forEach(function (el) {
+      var k = aud();
+      el.innerHTML = '<div class="gxaud">' + audBtns() + '</div><p class="gxhint">' + esc(T(D.hints[k], D.hints[k])) + '</p>';
+    });
+    qa('.gxr-me-len').forEach(function (el) { el.innerHTML = lenBtns('gxpill'); });
+  }
+  function setAud(k) {
+    if (KEYS.indexOf(k) < 0) return;
+    ST.aud = k; saveST();
+    toast(T('回答對象：', 'Answering for: ') + T(D.names[k], D.names[k]));
+    paintCtl(); quickRefresh(true); fuRefresh(true);
+  }
+  function reask() {
+    var b = BR();
+    if (!b.chat || !b.send || (b.busy && b.busy()) || !q1('#chatlog')) return false;
+    var c = b.chat(), n = c.length;
+    if (n < 2) return false;
+    var a = c[n - 1], u = c[n - 2];
+    if (!a || !u || a.role !== 'ai' || u.role !== 'user') return false;
+    if (/^(小智)?(請)?(繼續|接著)|^(please )?(continue|keep going)/i.test(String(u.text))) return false;
+    c.splice(n - 2, 2);
+    b.send(u.text);
+    return true;
+  }
+  function setLen(k, fromChat) {
+    if (alen() === k) return;
+    ST.len = k; saveST();
+    var nm = T(D.lenNames[k], D.lenNames[k]);
+    if (fromChat && reask()) toast(T('用「' + nm + '」重新回答…', 'Answering again: ' + nm + '…'));
+    else toast(T('回答長度：', 'Answer length: ') + nm);
+    paintCtl();
+  }
+  /* 範例問題跟著回答對象換 */
+  function quickRefresh(force) {
+    var p = q1('#qsPanel'); if (!p) return;
+    if (!p._gxrBase) { p._gxrBase = qa('.qs-chip', p).map(function (b) { return b.textContent; }); p.setAttribute('data-gxr', 'orig'); if (aud() === 'adult') return; }
+    if (!force && p.getAttribute('data-gxr') === aud()) return;
+    var base = p._gxrBase, list = aud() === 'adult' ? base : base.slice(0, 2).concat((A().q || []).slice(0, 6));
+    p.innerHTML = list.map(function (q) { return '<button type="button" class="qs-chip" data-gxr-q="1">' + esc(aud() === 'adult' ? q : T(q, q)) + '</button>'; }).join('');
+    p.setAttribute('data-gxr', aud());
+  }
+  /* 追問：回答完成後，依對象列出幾個常用追問 */
+  function fuRefresh(force) {
+    var log = q1('#chatlog'); if (!log || !D) return;
+    var b = BR();
+    if (b.busy && b.busy()) { qa('.gxr-fu', log).forEach(function (x) { x.remove(); }); return; }
+    var cards = qa('.msg.ai', log), last = cards[cards.length - 1];
+    var ex = qa('.gxr-fu', log);
+    if (!last || !last.querySelector('.msg-actions') || last !== log.lastElementChild) { ex.forEach(function (x) { x.remove(); }); return; }
+    if (ex.length === 1 && ex[0].parentNode === last && !force) return;
+    ex.forEach(function (x) { x.remove(); });
+    var fu = A().fu || []; if (!fu.length) return;
+    var d = document.createElement('div'); d.className = 'gxr-fu';
+    d.innerHTML = '<span class="gxlab">' + esc(T('追問', 'Follow up')) + '</span>' + fu.map(function (f, i) {
+      return '<button type="button" class="gxq" data-gxr-fu="' + i + '">' + esc(f[0]) + ' ' + esc(T(f[1], f[1])) + '</button>';
+    }).join('');
+    last.appendChild(d);
+  }
+
+  /* ══════════ 朗讀：多音字、括號出處、表情符號 ══════════ */
+  var EMOJI_RE = /[\u{1F000}-\u{1FAFF}\u{2190}-\u{21FF}\u{2300}-\u{27BF}\u{2B00}-\u{2BFF}\u{FE00}-\u{FE0F}\u{1F1E6}-\u{1F1FF}\u{200D}\u{20E3}]/gu;
+  var REF_PART = /^(?:[1-3一二三]?\s*[一-鿿A-Za-z]{1,18}\.?\s*)?\d+\s*[:：]\s*\d+(?:\s*[-–—~～至]\s*\d+)?$/;
+  function dropRefParens(s) {
+    return String(s || '').replace(/[（(]([^（）()]{1,80})[）)]/g, function (m, inner) {
+      var x = inner.replace(/^\s*(?:另見|參看|參見|参看|参见|參|参|見|见|cf\.?|see)\s*/i, '').replace(/^\s+|\s+$/g, '');
+      if (!x) return m;
+      var parts = x.split(/[；;、，,]/).map(function (p) { return p.replace(/^\s+|\s+$/g, ''); }).filter(Boolean);
+      return parts.length && parts.every(function (p) { return REF_PART.test(p); }) ? '' : m;
+    });
+  }
+  /* 送去語音之前先處理：括號裡只有出處不唸、表情符號不唸 */
+  function pre(s) {
+    var x = String(s == null ? '' : s);
+    try { x = dropRefParens(x).replace(EMOJI_RE, '').replace(/[ \t]{2,}/g, ' '); } catch (e) {}
+    return x;
+  }
+  var PRON = (function () {
+    var NUM = '[〇零一二三四五六七八九十百千萬万兩两幾几]+';
+    var UNIT = '(?:肘|尺|丈|寸|虎口|竿|掌|里|步)';
+    function R(s) { return new RegExp(s, 'g'); }
+    var SHARED = [
+      [R('重生'), '蟲生'], [R('重新'), '蟲新'], [R('重建'), '蟲建'], [R('重擔'), '眾擔'], [R('重担'), '众担'],
+      [R('長(?=' + NUM + UNIT + ')'), '常'], [R('长(?=' + NUM + UNIT + ')'), '常'],
+      [R('長(老|子|大|進|輩|執)'), '掌$1'], [R('长(老|子|大|进|辈|执)'), '掌$1'],
+      [R('(成|生|年|家|族|官|兄|師|师|首|牧|夫|組|组|團|团|校|部|區|区|社)(長|长)(?![久遠远存期])'), '$1掌'],
+      [R('差(遣|派|役)'), '拆$1'], [R('([主神祂他我])差(?=[人你我他門门使])'), '$1拆'],
+      [R('得[著着](?![急涼凉迷火慌])'), '得酌'],
+      [R('(^|[^成作行認认稱称以視视])([為为])(?=(?:主|神|祂|基督|耶穌|耶稣)(?:而活|而死|作工|做工|擺上|摆上|受苦|犧牲|牺牲|捨命|舍命|捨己|舍己|發熱心|发热心))'), '$1衛'],
+      [R('([為为])(?=(?:人|別人|别人|眾人|众人|你|你們|你们|我們|我们|他們|他们|弟兄姊妹)(?:禱告|祷告|代禱|代祷|代求|捨命|舍命))'), '衛'],
+      [R('(供|補|补)[給给]'), '$1己'], [R('[給给]予'), '己予'],
+      [R('應許'), '映許'], [R('应许'), '映许'], [R('應驗'), '映驗'], [R('应验'), '映验'], [R('應當'), '英當'], [R('应当'), '英当'],
+      [R('傳道'), '船道'], [R('传道'), '船道'], [R('(行|自)傳'), '$1賺'], [R('(行|自)传'), '$1赚'], [R('傳記'), '賺記'], [R('传记'), '赚记'],
+      [R('沒藥'), '莫藥'], [R('没药'), '莫药'], [R('嗎哪'), '馬哪'], [R('吗哪'), '马哪'], [R('撒種'), '撒腫'], [R('撒种'), '撒肿'], [R('撒但'), '仨但'],
+      [R('數一數'), '鼠一鼠'], [R('数一数'), '鼠一鼠'], [R('數(點|算)'), '鼠$1'], [R('数(点|算)'), '鼠$1'],
+      [R('參孫'), '餐孫'], [R('参孙'), '餐孙'], [R('阿們'), '阿門'], [R('阿们'), '阿门'], [R('冠冕'), '官冕'],
+      [R('朝(見|拜)'), '潮$1'], [R('朝(见|拜)'), '潮$1'], [R('背(起|負|负)'), '揹$1'], [R('看守'), '刊守'],
+      [R('說客'), '稅客'], [R('说客'), '税客'], [R('年少'), '年紹'], [R('(^|[^多不減减缺很太至最])少年'), '$1紹年'],
+      [R('盛(滿|满)'), '成$1'], [R('([一兩两三那這这])宿(?![舍])'), '$1朽'], [R('乾(?!坤)'), '甘'], [R('鴿'), '哥']
+    ];
+    var TW = [
+      [R('[說说]服'), '稅服'], [R('[遊游][說说]'), '遊稅'], [R('期'), '奇'], [R('企'), '器'], [R('[危微]'), '圍'], [R('寂'), '疾'],
+      [R('(^|[^人])[質质]'), '$1直'], [R('[暫暂]'), '站'], [R('[攜携]'), '西'], [R('曝'), '瀑'], [R('垃圾'), '樂色'], [R('[蝸蜗]'), '瓜'], [R('[結结]果子'), '節果子']
+    ];
+    var CN = [
+      [R('期'), '七'], [R('企'), '起'], [R('[危微]'), '威'], [R('寂'), '寄'], [R('(^|[^人])[质質]'), '$1至'],
+      [R('[暂暫]'), '赞'], [R('[携攜]'), '鞋'], [R('曝光'), '爆光'], [R('垃圾'), '拉鸡'], [R('[蜗蝸]'), '窝']
+    ];
+    function run(list, s) { for (var i = 0; i < list.length; i++) s = s.replace(list[i][0], list[i][1]); return s; }
+    function fix(s, std, voice) {
+      s = String(s == null ? '' : s);
+      if (!/[㐀-鿿]/.test(s)) return s;
+      s = run(SHARED, s);
+      var v = String(voice || ''), vTW = /zh[-_]TW|zh[-_]HK/i.test(v), vCN = /zh[-_]CN|cmn/i.test(v);
+      if (std === 'tw' && vCN) s = run(TW, s);
+      else if (std === 'cn' && vTW) s = run(CN, s);
+      return s;
+    }
+    var stdNow = function () { return SC ? 'cn' : 'tw'; };
+    function hookNative() {
+      try {
+        var ss = window.speechSynthesis;
+        if (!ss || ss.__pron) return;
+        var sp = ss.speak.bind(ss);
+        ss.speak = function (u) { try { if (u && u.text) u.text = fix(u.text, stdNow(), u.lang || ''); } catch (e) {} return sp(u); };
+        ss.__pron = 1;
+      } catch (e) {}
+    }
+    return { fix: fix, hookNative: hookNative };
+  })();
+  PRON.hookNative();
+  /* 語音端：Azure 聲音名稱（zh-TW／zh-CN）決定要不要套兩岸差異 */
+  function pron(x) {
+    if (EN) return x;
+    var v = ''; try { v = BR().voice ? BR().voice() : ''; } catch (e) {}
+    return PRON.fix(x, SC ? 'cn' : 'tw', v);
+  }
+
+  /* ══════════ 朗讀：背景播放、螢幕不休眠、浮動控制列 ══════════ */
+  var wl = null, msInit = false, barPaused = false;
+  function wlAcquire() { try { if (navigator.wakeLock && !wl && document.visibilityState === 'visible') { navigator.wakeLock.request('screen').then(function (w) { wl = w; w.addEventListener('release', function () { wl = null; }); }, function () { wl = null; }); } } catch (e) { wl = null; } }
+  function wlRelease() { try { if (wl) wl.release(); } catch (e) {} wl = null; }
+  document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible' && speaking) wlAcquire(); });
+  function msSet() {
+    if (!('mediaSession' in navigator) || typeof MediaMetadata === 'undefined') return;
+    try {
+      var b = BR(), ttl = (b.title && b.title()) || APP();
+      navigator.mediaSession.metadata = new MediaMetadata({ title: String(ttl).slice(0, 80), artist: T('國度321空中團契', 'Kingdom 321 Online Fellowship'), album: APP(), artwork: [{ src: 'icon-512.png', sizes: '512x512', type: 'image/png' }] });
+      if (!msInit) {
+        msInit = true;
+        navigator.mediaSession.setActionHandler('play', function () { barToggle(true); });
+        navigator.mediaSession.setActionHandler('pause', function () { barToggle(false); });
+        navigator.mediaSession.setActionHandler('stop', function () { if (BR().stop) BR().stop(); });
+      }
+      navigator.mediaSession.playbackState = barPaused ? 'paused' : 'playing';
+    } catch (e) {}
+  }
+  function msClear() { try { if ('mediaSession' in navigator) { navigator.mediaSession.playbackState = 'none'; navigator.mediaSession.metadata = null; } } catch (e) {} }
+  var speaking = false;
+  function tbH() { var t = q1('.tabbar,#tabbar,nav.tabs,.nav'); return t && t.offsetHeight ? t.offsetHeight : 0; }
+  function barEl() {
+    var sb = q1('#spkbar');   /* 學神院系列自己就有底部朗讀列：在它上面加「暫停」，不另做一條 */
+    if (sb) {
+      if (!sb.querySelector('[data-gxr-bar=pp]')) { sb.insertAdjacentHTML('afterbegin', '<span class="gxbt"><b></b></span><button type="button" data-gxr-bar="pp">⏸ ' + T('暫停', 'Pause') + '</button>'); }
+      return sb;
+    }
+    var el = q1('#gxrBar');
+    if (!el) {
+      el = document.createElement('div'); el.id = 'gxrBar';
+      el.innerHTML = '<span class="gxbt">🔊 <b></b></span><button type="button" data-gxr-bar="pp" aria-label="pause">⏸</button><button type="button" data-gxr-bar="stop" aria-label="stop">⏹</button>';
+      document.body.appendChild(el);
+    }
+    return el;
+  }
+  function ttsState(st) {
+    if (st) {
+      if (!speaking) barPaused = false;
+      speaking = true;
+      var el = barEl(), b = BR(), own = el.id === 'gxrBar';
+      if (own) { el.style.bottom = 'calc(' + (tbH() + 10) + 'px + env(safe-area-inset-bottom,0px))'; }
+      q1('b', el).textContent = T('朗讀中', 'Reading') + ((b.title && b.title()) ? '・' + String(b.title()).slice(0, 14) : '');
+      ppLabel(el);
+      el.className = 'on';
+      try { var au = BR().audio && BR().audio(); if (au && !au._gxr) { au._gxr = 1; au.addEventListener('play', function () { if (barPaused && speaking) { try { au.pause(); } catch (e) {} } }); } } catch (e) {}
+      if (barPaused) { try { BR().pause && BR().pause(); } catch (e) {} } else { wlAcquire(); }
+      msSet();
+    } else {
+      speaking = false; barPaused = false;
+      var e2 = q1('#gxrBar'); if (e2) e2.className = '';
+      var e3 = q1('#spkbar'); if (e3) e3.className = '';
+      wlRelease(); msClear();
+    }
+  }
+  function ppLabel(el) {
+    var pp = el && q1('[data-gxr-bar=pp]', el); if (!pp) return;
+    var own = el.id === 'gxrBar';
+    pp.textContent = own ? (barPaused ? '▶' : '⏸') : (barPaused ? '▶ ' + T('繼續', 'Resume') : '⏸ ' + T('暫停', 'Pause'));
+  }
+  function barToggle(play) {
+    var b = BR(), el = q1('#spkbar') || q1('#gxrBar');
+    if (play === undefined) play = barPaused;
+    try { if (play) { b.resume && b.resume(); barPaused = false; wlAcquire(); } else { b.pause && b.pause(); barPaused = true; wlRelease(); } } catch (e) {}
+    ppLabel(el);
+    try { if ('mediaSession' in navigator) navigator.mediaSession.playbackState = barPaused ? 'paused' : 'playing'; } catch (e) {}
+  }
+
+  /* ══════════ 畫線面板補件 ══════════ */
+  function copyText(t, ok) {
+    function done() { toast(ok || T('已複製', 'Copied')); }
+    function fallback() {
+      try {
+        var ta = document.createElement('textarea'); ta.value = t; ta.setAttribute('readonly', ''); ta.style.cssText = 'position:fixed;left:-9999px;top:0;opacity:0';
+        document.body.appendChild(ta); ta.select(); var r = document.execCommand('copy'); document.body.removeChild(ta);
+        if (r) done(); else toast(T('無法複製，請長按文字自行複製', 'Cannot copy — press and hold the text'));
+      } catch (e) { toast(T('無法複製，請長按文字自行複製', 'Cannot copy — press and hold the text')); }
+    }
+    try { navigator.clipboard.writeText(t).then(done, fallback); } catch (e) { fallback(); }
+  }
+  function pageUrl() { return location.protocol.indexOf('http') === 0 ? location.origin + location.pathname.replace(/index\.html$/, '') : ''; }
+  function hlRef(h) { return (h && h.ut && h.src !== 'chat') ? h.ut : ''; }
+  function hlLine(h) {
+    var r = hlRef(h), t = String(h.t || '');
+    return (EN ? '“' : '「') + t + (EN ? '”' : '」') + '\n—— ' + APP() + (r ? '・' + r : '') + (h.n ? '\n' + (EN ? 'Note: ' : '默想：') + h.n : '') + (pageUrl() ? '\n' + pageUrl() : '');
+  }
+  var HLX = {
+    card: function (h) {
+      if (window.GXU && GXU.open) { GXU.open({ text: h.t, ref: APP() + (hlRef(h) ? '・' + hlRef(h) : ''), note: h.n || '', plain: true }); return true; }
+      toast(T('美圖工作室還沒載入，請稍後再試', 'Card studio is not ready yet')); return false;
+    },
+    copy: function (h) { copyText(hlLine(h), T('已複製這一句', 'Copied')); },
+    share: function (h) {
+      var body = hlLine(h);
+      if (navigator.share) { try { navigator.share({ title: APP(), text: body }).then(null, function (e) { if (!e || e.name !== 'AbortError') copyText(body, T('已複製，可以貼到群組或社群', 'Copied — paste it anywhere')); }); return; } catch (e) {} }
+      copyText(body, T('已複製，可以貼到群組或社群', 'Copied — paste it anywhere'));
+    },
+    toast: toast,
+    t: function (zh, en) { return T(zh, en); }
+  };
+
+  /* ══════════ 美圖／我的作品入口＋小智設定卡（我的／設定頁） ══════════ */
+  function meMount() {
+    if (!D || q1('#gxrMe')) return;
+    var anchor = null;
+    var hlb = q1('[data-go="hls"]');
+    if (hlb && hlb.closest('.card')) anchor = hlb.closest('.card');
+    if (!anchor) { var rg = q1('input[type=range][oninput*="set.fs"]'); if (rg && rg.closest('.card')) anchor = rg.closest('.card'); }
+    if (!anchor) return;
+    var c = document.createElement('div'); c.className = 'card'; c.id = 'gxrMe';
+    c.innerHTML = '<b>' + esc(T('小智與美圖', 'Xiaozhi & card studio')) + '</b>' +
+      '<p class="gxlab" style="margin:10px 0 6px">' + esc(T('小智回答對象', 'Who Xiaozhi answers for')) + '</p><div class="gxr-me-aud"></div>' +
+      '<p class="gxlab" style="margin:10px 0 6px">' + esc(T('回答長度', 'Answer length')) + '</p><div class="gxr-me-len gxpills"></div>' +
+      '<div class="gxrow" style="margin-top:12px"><button type="button" class="iconbtn btn alt" data-gxr-studio="panel">🖼 ' + esc(T('美圖工作室', 'Card studio')) + '</button>' +
+      '<button type="button" class="iconbtn btn alt" data-gxr-studio="works">📂 ' + esc(T('我的作品', 'My creations')) + '</button></div>';
+    anchor.parentNode.insertBefore(c, anchor.nextSibling);
+    paintCtl();
+  }
+  function chatMount() {
+    var w = q1('.chatwrap'); if (!w || !D) return;
+    if (!q1('#gxrCtl')) {
+      var c = document.createElement('div'); c.id = 'gxrCtl'; c.innerHTML = ctlHTML();
+      var qb = q1('#qsBtn', w);
+      if (qb) qb.parentNode.insertBefore(c, qb); else w.insertBefore(c, w.firstChild);
+    }
+    quickRefresh(false); fuRefresh(false);
+  }
+  /* 每個小標題旁的「🔊」：從這一段開始朗讀下去 */
+  function paraMount() {
+    var b = BR(); if (!b.from) return;
+    qa('#stepBody,#doc').forEach(function (root) {
+      qa('h2,h3,h4', root).forEach(function (h) {
+        if (h.querySelector('.gxr-pb') || h.closest('.hl-note')) return;
+        var nx = null, all = qa('.sent', root), i;
+        for (i = 0; i < all.length; i++) { if (h.compareDocumentPosition(all[i]) & 4) { nx = all[i]; break; } }
+        if (!nx) return;
+        var btn = document.createElement('button'); btn.type = 'button'; btn.className = 'gxr-pb'; btn.textContent = '🔊';
+        btn.setAttribute('aria-label', T('從這一段朗讀', 'Read from this section')); btn.setAttribute('data-gxr-pb', nx.getAttribute('data-k'));
+        h.appendChild(btn);
+      });
+    });
+  }
+  /* 頂列的「🔊」：整頁跟讀（這一步／這一課有朗讀鈕時才顯示；再按一次停止） */
+  function topMount() {
+    var hd = q1('header.top .in'); if (!hd || !BR().readPage) return;
+    var b = q1('#gxrTop');
+    if (!b) {
+      b = document.createElement('button'); b.type = 'button'; b.id = 'gxrTop'; b.className = 'iconbtn'; b.textContent = '🔊';
+      b.setAttribute('aria-label', T('朗讀整頁', 'Read this page'));
+      var tb = q1('#themeBtn', hd); if (tb) hd.insertBefore(b, tb); else hd.appendChild(b);
+    }
+    b.style.display = q1('#readBtn') ? '' : 'none';
+  }
+  var scanT = 0;
+  function scan() { clearTimeout(scanT); scanT = setTimeout(function () { try { chatMount(); meMount(); paraMount(); topMount(); } catch (e) {} }, 60); }
+  new MutationObserver(scan).observe(document.documentElement, { childList: true, subtree: true });
+
+  /* ── 點擊（全部用事件委派，重畫之後不會失效） ── */
+  document.addEventListener('click', function (e) {
+    var t = e.target; if (!t || !t.closest) return;
+    var x;
+    if ((x = t.closest('[data-gxr-aud]'))) { e.preventDefault(); setAud(x.getAttribute('data-gxr-aud')); return; }
+    if ((x = t.closest('[data-gxr-len]'))) { e.preventDefault(); setLen(x.getAttribute('data-gxr-len'), !!q1('#chatlog')); return; }
+    if ((x = t.closest('[data-gxr-togaud]'))) { e.preventDefault(); audOpen = !audOpen; paintCtl(); return; }
+    if ((x = t.closest('[data-gxr-fs]'))) { e.preventDefault(); var b = BR(); if (b.setFs) { var n = b.setFs(); toast(T('字級 ', 'Text size ') + n); } return; }
+    if ((x = t.closest('[data-gxr-q]'))) { e.preventDefault(); var p = q1('#qsPanel'); if (p) p.hidden = true; if (BR().send) BR().send(x.textContent); return; }
+    if ((x = t.closest('[data-gxr-fu]'))) {
+      e.preventDefault();
+      var f = (A().fu || [])[+x.getAttribute('data-gxr-fu')]; if (f && BR().send) BR().send(T(f[2], f[2]));
+      return;
+    }
+    if (t.closest('#gxrTop')) { e.preventDefault(); if (BR().readPage) BR().readPage(); return; }
+    if ((x = t.closest('[data-gxr-pb]'))) { e.preventDefault(); e.stopPropagation(); if (BR().from) BR().from(x.getAttribute('data-gxr-pb')); return; }
+    if ((x = t.closest('[data-gxr-bar]'))) { e.preventDefault(); if (x.getAttribute('data-gxr-bar') === 'stop') { if (BR().stop) BR().stop(); } else barToggle(); return; }
+    if ((x = t.closest('[data-gxr-studio]'))) {
+      e.preventDefault();
+      if (!window.GXU) { toast(T('美圖工作室還沒載入', 'Card studio is not ready')); return; }
+      if (x.getAttribute('data-gxr-studio') === 'works') GXU.works(); else GXU.panel();
+    }
+  });
+
+  /* ── 樣式 ── */
+  var css = document.createElement('style'); css.id = 'gxrCss';
+  css.textContent = [
+    '#gxrToast{position:fixed;left:50%;bottom:calc(86px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:rgba(20,24,32,.92);color:#fff;font-size:14px;padding:9px 16px;border-radius:999px;z-index:400;max-width:86vw;text-align:center;opacity:0;pointer-events:none;transition:opacity .2s}',
+    '#gxrToast.on{opacity:1}',
+    '.hlsheet-card{max-height:92vh;overflow-y:auto;-webkit-overflow-scrolling:touch}',
+    '.spanrow{display:flex;flex-wrap:wrap;align-items:center;gap:6px}',
+    '.spanbtn.wide{min-width:0;padding:0 12px;font-size:.88em;white-space:nowrap}',
+    '.hlsheet-acts .sbtn{padding:10px 4px;font-size:.92em;white-space:nowrap}',
+    '#gxrCtl{margin:8px 0 6px}',
+    '#gxrCtl .gxrow,#gxrMe .gxrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}',
+    '.gxsm{border:1px solid var(--line,#D5D9E3);background:var(--surface,var(--card,#fff));color:var(--ink,#1A2233);border-radius:999px;padding:6px 12px;font:inherit;font-size:.88em;cursor:pointer}',
+    '.gxsm.gxfs{font-weight:700;min-width:38px;padding:6px 10px;margin-left:auto}',
+    '.gxlen{display:inline-flex;align-items:center;gap:4px;flex-wrap:wrap}',
+    '.gxlen button,.gxpill{border:1px solid var(--line,#D5D9E3);background:var(--surface,var(--card,#fff));color:var(--ink,#1A2233);border-radius:999px;padding:5px 11px;font:inherit;font-size:.85em;cursor:pointer}',
+    '.gxlen button.on,.gxpill.on{background:var(--accent,var(--acc,#2C5A9C));border-color:var(--accent,var(--acc,#2C5A9C));color:#fff}',
+    '.gxpills{display:flex;gap:6px;flex-wrap:wrap}',
+    '.gxlab{font-size:.8em;color:var(--muted,var(--sub,#586177));margin:0 2px 0 0;font-weight:600}',
+    '.gxaud{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 2px}',
+    '.gxa{border:1px solid var(--line,#D5D9E3);background:var(--surface,var(--card,#fff));color:var(--ink,#1A2233);border-radius:999px;padding:6px 11px;font:inherit;font-size:.86em;cursor:pointer}',
+    '.gxa.on{background:var(--accent,var(--acc,#2C5A9C));border-color:var(--accent,var(--acc,#2C5A9C));color:#fff}',
+    '.gxhint{font-size:.8em;color:var(--muted,var(--sub,#586177));margin:4px 2px 0}',
+    '.gxr-fu{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:10px;padding-top:8px;border-top:1px dashed var(--line,#D5D9E3)}',
+    '.gxq{border:1px solid var(--line,#D5D9E3);background:var(--surface,var(--card,#fff));color:var(--ink,#1A2233);border-radius:999px;padding:5px 11px;font:inherit;font-size:.84em;cursor:pointer}',
+    '#gxrBar{position:fixed;left:50%;transform:translateX(-50%) translateY(20px);bottom:76px;display:none;align-items:center;gap:8px;background:rgba(20,24,32,.94);color:#fff;border-radius:999px;padding:7px 8px 7px 16px;z-index:60;box-shadow:0 6px 18px rgba(0,0,0,.28);max-width:92vw;font-size:14px}',
+    '#gxrBar.on{display:flex;transform:translateX(-50%)}',
+    '#gxrBar .gxbt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+    '#gxrBar button{border:0;background:rgba(255,255,255,.16);color:#fff;width:38px;height:38px;border-radius:50%;font-size:16px;cursor:pointer}',
+    '.msg.ai .gxr-fu .gxq{max-width:100%}',
+    '#spkbar .gxbt{flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;align-self:center;text-align:left}',
+    '#spkbar button{white-space:nowrap;flex:0 0 auto}',
+    '.chatwrap .msg.ai{max-width:100%;box-sizing:border-box}',
+    '.chatwrap .msg.user{max-width:92%}',
+    '#gxrTop{padding:4px 9px;font-size:15px;line-height:1.2;white-space:nowrap}',
+    '@media (max-width:359px){#gxrTop{display:none!important}}',
+    '.gxr-pb{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;margin-left:8px;border-radius:50%;border:1px solid var(--line,#D5D9E3);background:var(--surface,var(--card,#fff));color:var(--muted,var(--sub,#586177));font-size:13px;line-height:1;padding:0;vertical-align:middle;cursor:pointer}'
+  ].join('\n');
+  document.head.appendChild(css);
+
+  window.GXR = { sysExtra: sysExtra, pre: pre, pron: pron, ttsState: ttsState, hl: HLX, setAud: setAud, setLen: setLen, state: function () { return { aud: aud(), len: alen() }; }, scan: scan, reask: reask };
+  scan();
+})();
+
+</script>
 <script id="k321meet">window.K321MEET_CFG={hook:{sel:'#view',before:':scope > p.tiny:last-child',where:'end',need:function(h){return !!h.querySelector('[data-act="prayStart"]')}},lang:function(){try{return window.I18N&&I18N.lang}catch(e){return ''}}};
 /* 國度321空中團契 · 首頁「下一堂聚會／一鍵加入聚會／聚會時間與奉獻支持」 k321meet v1 */
 (function () {
@@ -3858,6 +4333,6 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
 })();
 </script>
 <script>window.CR321_CFG={pfx:'gs321-',names:{zh:'321福音同行',zs:'321福音同行',en:'321 Gospel Companion'},root:function(){return document.getElementById('view')||document.body},top:function(){var s=document.getElementById('sheet');return(s&&s.className.indexOf('hidden')<0)?s.querySelector('header.topbar'):document.querySelector('header.topbar')},scroller:function(){var s=document.getElementById('sheet');return(s&&s.className.indexOf('hidden')<0)?document.getElementById('sheetView'):window},nav:function(){var G=window.__G,R=G&&G.R;if(!R)return null;if(['today','tools','cards','learn'].indexOf(R.tab)<0)return null;var SH={handsIndex:[],handsHand:['id'],handsFinger:['h','i'],gospel:[],slides:['i'],script:['id'],decision:[],cost:[],faq:['cat'],ice:[],frustration:[],track:['id'],lesson:['t','l'],res:[],prayers:['focus'],cards:[],tenIndex:[],tenFlow:[],tenIce:[],tenFive:[],tenOne:['id'],tenTurn:['id'],tenGrow:[],blIndex:[],blHow:[]};var st=[];for(var i=0;i<R.stack.length;i++){var e=R.stack[i],ks=SH[e.name];if(!ks)return null;var a={};for(var j=0;j<ks.length;j++){var v=e.arg&&e.arg[ks[j]];if(v!=null){if(typeof v!=='string'&&typeof v!=='number')return null;if(String(v).length>60)return null;a[ks[j]]=v}}st.push([e.name,a,String(e.title||'').slice(0,40)])}return st.length?{tab:R.tab,st:st}:{tab:R.tab}},go:function(o){var G=window.__G,R=G.R;try{G.TTS&&G.TTS.stop&&G.TTS.stop()}catch(e){}if(R.tab!==o.tab){G.go(o.tab)}else if(R.stack.length){G.closeSheet()}var st=o.st||[];for(var i=0;i<st.length;i++)G.push(st[i][0],st[i][1],st[i][2])}};</script>
-<script src="coread.js?v=4.9.1-k3m-vp1023-co1"></script>
+<script src="coread.js?v=4.9.2-k3m-vp1023-gx1103-co1"></script>
 </body>
 </html>
