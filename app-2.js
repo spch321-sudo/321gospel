@@ -695,9 +695,10 @@ SHEETS.settings = async function () {
     <div class="eyebrow">更新</div>
     <p class="tiny">改版後若畫面沒有變化，按這裡清除快取重新載入。
     iOS 若仍未更新，請把主畫面圖示刪除後重新加入。</p>
+    <button class="btn quiet" data-act="checkUpd" style="margin-top:10px">檢查更新</button>
     <button class="btn quiet" data-act="forceUpdate" style="margin-top:10px">強制更新</button>
   </div>
-  <p class="tiny" style="text-align:center">版本 ${APP_VERSION}</p>`;
+  <p class="tiny" style="text-align:center">版本 ${APPVER}</p>`;
 };
 ACTS.openSettings = () => push('settings', {}, '設定');
 ACTS.setLang = d => { if (window.I18N) window.I18N.set(d.v); };
@@ -711,10 +712,11 @@ ACTS.saveTimes = () => {
   saveS('amTime', $('#tAm').value); saveS('pmTime', $('#tPm').value);
   toast('已儲存');
 };
+ACTS.checkUpd = () => { if (window.UPD321) UPD321.check(1); };
 ACTS.forceUpdate = () => {
   confirmBox('強制更新', '將清除快取並重新載入最新版本。\n你的資料不會受影響。', '確定', async () => {
     try {
-      if ('caches' in window) { const ks = await caches.keys(); await Promise.all(ks.map(k => caches.delete(k))); }
+      if ('caches' in window) { const ks = await caches.keys(); await Promise.all(ks.filter(k => k.indexOf('g321-') === 0).map(k => caches.delete(k))); }  /* 只清本 App 前綴，同網域還有其他 321 App */
       if (navigator.serviceWorker) {
         const rs = await navigator.serviceWorker.getRegistrations();
         await Promise.all(rs.map(r => r.unregister()));
@@ -1984,8 +1986,7 @@ SHEETS.faq = async function (arg) {
 };
 window.addEventListener('pagehide', () => TTS.stop());
 
-if ('serviceWorker' in navigator)
-  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+/* Service Worker 註冊與自動更新改由 upd321.js 負責（updateViaCache:'none'、version.json 輪詢、空閒自動套用） */
 
 boot();
 })();

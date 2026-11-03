@@ -652,7 +652,7 @@ window.I18N = {
 })();
 </script>
 <script>
-const APPVER = '4.9.2-k3m-vp1023-gx1103-co1';
+const APPVER = '4.9.3-k3m-vp1023-gx1103-co1-up1103';
 
 /* =========================================================
    321 福音同行  ——  國度321空中團契
@@ -4334,5 +4334,7 @@ window.GXR_SCM={"m":["丟並乾亂亙亞佈佔併來係俱倉個們倖倫偉側�
 </script>
 <script>window.CR321_CFG={pfx:'gs321-',names:{zh:'321福音同行',zs:'321福音同行',en:'321 Gospel Companion'},root:function(){return document.getElementById('view')||document.body},top:function(){var s=document.getElementById('sheet');return(s&&s.className.indexOf('hidden')<0)?s.querySelector('header.topbar'):document.querySelector('header.topbar')},scroller:function(){var s=document.getElementById('sheet');return(s&&s.className.indexOf('hidden')<0)?document.getElementById('sheetView'):window},nav:function(){var G=window.__G,R=G&&G.R;if(!R)return null;if(['today','tools','cards','learn'].indexOf(R.tab)<0)return null;var SH={handsIndex:[],handsHand:['id'],handsFinger:['h','i'],gospel:[],slides:['i'],script:['id'],decision:[],cost:[],faq:['cat'],ice:[],frustration:[],track:['id'],lesson:['t','l'],res:[],prayers:['focus'],cards:[],tenIndex:[],tenFlow:[],tenIce:[],tenFive:[],tenOne:['id'],tenTurn:['id'],tenGrow:[],blIndex:[],blHow:[]};var st=[];for(var i=0;i<R.stack.length;i++){var e=R.stack[i],ks=SH[e.name];if(!ks)return null;var a={};for(var j=0;j<ks.length;j++){var v=e.arg&&e.arg[ks[j]];if(v!=null){if(typeof v!=='string'&&typeof v!=='number')return null;if(String(v).length>60)return null;a[ks[j]]=v}}st.push([e.name,a,String(e.title||'').slice(0,40)])}return st.length?{tab:R.tab,st:st}:{tab:R.tab}},go:function(o){var G=window.__G,R=G.R;try{G.TTS&&G.TTS.stop&&G.TTS.stop()}catch(e){}if(R.tab!==o.tab){G.go(o.tab)}else if(R.stack.length){G.closeSheet()}var st=o.st||[];for(var i=0;i<st.length;i++)G.push(st[i][0],st[i][1],st[i][2])}};</script>
 <script src="coread.js?v=4.9.2-k3m-vp1023-gx1103-co1"></script>
+<script>window.UPD321_PFX=["g321-"];window.UPD321_LANG=function(){var l=window.I18N&&I18N.lang;return l==="en"?"en":(l==="sc"?"sc":"tc");};</script>
+<script src="upd321.js?v=4.9.3-k3m-vp1023-gx1103-co1-up1103"></script>
 </body>
 </html>
