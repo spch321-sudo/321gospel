@@ -12,16 +12,10 @@ var XZ_MODEL = 'claude-sonnet-4-6';
 
 var chat = { open: false, msgs: [], busy: false, favView: false, topic: -1, pid: '', anon: true };
 /* gx1103：回答長度、字級、全螢幕（存在本機） */
-chat.len = LS.get('xzLen', 'mid'); chat.xf = LS.get('xzXf', 1); chat.full = LS.get('xzFull', false);
+chat.xf = LS.get('xzXf', 1);
 function XL(zh, en) { return (window.GXR && GXR.hl) ? GXR.hl.t(zh, en) : zh; }
-var XZ_MAXTOK = { brief: 700, mid: 1000, full: 1800 };
 var XZ_CONT = XL('請從你剛才停下的地方直接接著寫完，不要重複前面已經寫過的內容。', 'Please continue exactly where you stopped and finish; do not repeat what you already wrote.');
-function lenExtra() {
-  var k = chat.len, en = (window.I18N && window.I18N.lang) === 'en';
-  if (k === 'brief') return en ? '\n\n[Length] Keep the answer as short as possible: one-sentence conclusion, then at most 3 short points, about 120 words in all.' : '\n\n【回答長度】請把答案縮到最精簡：先給一句結論，再用至多 3 個短要點，全部約 150 字以內。';
-  if (k === 'full') return en ? '\n\n[Length] Answer fully and in detail: conclusion first, then reasons, the Scripture basis, and wording or examples I can use directly (about 500-800 words), still warm and conversational.' : '\n\n【回答長度】請完整、詳細地回答：先給結論，再分段說明理由、聖經根據，以及我可以直接使用的說法或例子（約 500 到 800 字），仍要口語、溫暖、不說教。';
-  return '';
-}
+/* -xz1103：回答長度（五段）、回答對象、讀者資料、慕道友信仰背景改由 XZ2 套件提供（xz2.js），這裡不再自己加長度句 */
 var people = [];
 var host = null;
 
@@ -481,7 +475,7 @@ function baseSystem() {
     '',
     '【回答的方式】',
     '一律用繁體中文。引用聖經一律用《和合本》，只在你確實有把握時引用，絕不杜撰經文或出處；不確定就誠實說明。',
-    '回應要精簡、務實、可以馬上做。通常兩三段之內，先接住他的心情，再給一到兩個具體可行的下一步，必要時加上一句經文或一段簡短的禱告。',
+    '回應要務實、可以馬上做，實際篇幅依下方的長度設定。先接住他的心情，再給一到兩個具體可行的下一步，必要時加上一句經文或一段簡短的禱告。',
     '因為回答可能會被朗讀出來：請用自然口語，不要使用表格、不要用直線分隔、不要用井號標題、不要用星號粗體、不要用條列符號。經文出處請寫成可朗讀的形式，例如「約翰福音三章十六節」。',
     '若他要求代擬訊息（例如 LINE 或簡訊），請直接寫出可以複製貼上的短訊，語氣自然、不像傳單、不說教，長度以三到五句為宜。',
     '',
@@ -523,14 +517,14 @@ function personCtx() {
   return L.join('\n');
 }
 
-function sysPrompt() { return baseSystem() + personCtx() + lenExtra(); }
+function sysPrompt() { return baseSystem() + personCtx() + XZ2.sysExtra(); }
 
 /* ---------------- 呼叫 ---------------- */
 async function fetchOnce(msgs, ctrl) {
   var res = await fetch(XZ_ENDPOINT, {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
     signal: ctrl ? ctrl.signal : undefined,
-    body: JSON.stringify({ model: XZ_MODEL, max_tokens: XZ_MAXTOK[chat.len] || 1000, system: sysPrompt(), messages: msgs })
+    body: JSON.stringify({ model: XZ_MODEL, max_tokens: XZ2.maxTokens(), system: sysPrompt(), messages: msgs })
   });
   if (!res.ok) throw new Error('HTTP ' + res.status);
   var data = await res.json();
@@ -558,12 +552,12 @@ async function call() {
   try {
     var base = chat.msgs.map(function (m) { return { role: m.role, content: m.text }; });
     var r1 = await fetchOnce(base, ctrl), text = r1.t, sr = r1.sr, more = 0;
-    while (sr === 'max_tokens' && text && more < 2) {
+    while (sr === 'max_tokens' && text && more < 4) {
       more++;
       if (timer) clearTimeout(timer);
       timer = ctrl ? setTimeout(function () { try { ctrl.abort(); } catch (e) {} }, 40000) : null;
       var rn = await fetchOnce(base.concat([{ role: 'assistant', content: text }, { role: 'user', content: XZ_CONT }]), ctrl);
-      text += rn.t; sr = rn.sr;
+      text = XZ2.join(text, rn.t); sr = rn.sr;
     }
     if (!text) text = '小智一時想不出合適的話，但神的話永不落空。要不要換個方式再問一次？';
     chat.msgs.push({ role: 'assistant', text: text, cut: sr === 'max_tokens' });
@@ -645,13 +639,9 @@ function fuHTML() {
   }).join('') + '</div>';
 }
 function toolsBar() {
-  var L = { brief: ['簡要', 'Short'], mid: ['適中', 'Medium'], full: ['詳細', 'Detailed'] };
-  return '<div class="xz-who xz-tools"><span class="lb">' + XL('回答長度', 'Length') + '</span>'
-    + ['brief', 'mid', 'full'].map(function (k) {
-      return '<button class="xz-wchip" aria-pressed="' + (chat.len === k) + '" data-xz="len" data-k="' + k + '">' + XL(L[k][0], L[k][1]) + '</button>';
-    }).join('')
-    + '<button class="xz-wchip" data-xz="fs" aria-label="' + XL('字級', 'Text size') + '">A</button>'
-    + '<button class="xz-wchip" data-xz="full" aria-pressed="' + (!!chat.full) + '" aria-label="' + XL('全螢幕', 'Full screen') + '">⛶</button></div>';
+  /* 對象／讀者資料／範例問題／回答長度五段／摘要列由 XZ2 畫；這裡只留字級鈕 */
+  return '<div class="xz-xzc"><div style="display:flex;gap:8px;align-items:flex-start"><div style="flex:1;min-width:0">' + XZ2.controlsHtml({ qs: true }) + '</div>'
+    + '<button class="xz-wchip" data-xz="fs" aria-label="' + XL('字級', 'Text size') + '">A</button></div></div>';
 }
 
 function draw() {
@@ -698,7 +688,7 @@ function draw() {
         body += '<div class="xz-sep">· 前面的問答都保留著 ·</div>' + picker('換個需要．回這裡繼續發問');
       }
     }
-    h += '<div class="xz-overlay" data-xz="bg" style="--xzf:' + (+chat.xf || 1) + '"><div class="xz-sheet' + (chat.full ? ' full' : '') + '">'
+    h += '<div class="xz-overlay" data-xz="bg" style="--xzf:' + (+chat.xf || 1) + '"><div class="xz-sheet full">'
       + '<div class="xz-head"><span class="ava">✨</span><div class="grow"><div class="nm">小智</div>'
       + '<div class="rl">傳福音的屬靈同伴 · 陪你把人帶到耶穌面前</div></div>'
       + '<button class="xz-hbtn" data-xz="favs" aria-label="收藏">⭐</button>'
@@ -721,10 +711,23 @@ function send(t) {
   if (chat.busy) return;
   t = (t || '').trim(); if (!t) return;
   chat.favView = false; chat.topic = -1;
+  try { XZ2.collapse(); } catch (e) {}
   chat.msgs.forEach(function (m) { if (m.role === 'assistant') m.col = true; });
   chat.msgs.push({ role: 'user', text: t });
   draw(); toBottom(); call();
 }
+/* XZ2 掛點：切長度／信仰背景時，把最後一組問答拿掉，用同一個問題重新回答（取代、不疊加） */
+window.__xzReAnswer = function (msg) {
+  if (chat.busy) return false;
+  var ui = -1; chat.msgs.forEach(function (m, i) { if (m.role === 'user') ui = i; });
+  if (ui < 0 || ui === chat.msgs.length - 1) return false;
+  var q = chat.msgs[ui].text;
+  chat.msgs.splice(ui);
+  if (msg) toast(msg);
+  send(q);
+  return true;
+};
+window.__xzAsk = function (q) { if (!chat.open) { open(); } send(q); };
 window.__xzSend = function () {
   var i = document.getElementById('xz-in'); if (!i) return;
   var t = i.value; i.value = ''; send(t);
@@ -795,9 +798,7 @@ document.addEventListener('click', function (ev) {
   else if (a === 'cat') { chat.topic = (chat.topic === i ? -1 : i); draw(); var q = document.getElementById('xz-topicqs'); if (q && q.scrollIntoView) q.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
   else if (a === 'ask') { var t = XZ_TOPICS[i] && XZ_TOPICS[i].qs[j]; if (t) send(t); }
   else if (a === 'quick') { send(quicks()[i]); }
-  else if (a === 'len') { chat.len = el.dataset.k; LS.set('xzLen', chat.len); draw(); toast(XL('下一個問題起，會照這個長度回答', 'The next answer will use this length')); }
   else if (a === 'fs') { var FS = [1, 1.15, 1.3, 0.9], fi = FS.indexOf(+chat.xf); chat.xf = FS[(fi + 1) % FS.length]; LS.set('xzXf', chat.xf); draw(); }
-  else if (a === 'full') { chat.full = !chat.full; LS.set('xzFull', chat.full); draw(); }
   else if (a === 'tog') { var mt = chat.msgs[i]; if (mt) { mt.col = !mt.col; draw(); } }
   else if (a === 'cont') { contLast(); }
   else if (a === 'fu') { var fq = XZ_FU[j]; if (fq) send(XL(fq[0], fq[1])); }

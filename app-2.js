@@ -670,6 +670,10 @@ SHEETS.settings = async function () {
     </div>
     <button class="btn quiet sm" data-act="testTts" style="width:100%;margin-top:10px">試聽一句</button>
   </div>
+  <div class="card" id="xzSet">
+    <div class="eyebrow">${lg === 'en' ? 'Xiaozhi' : '小智'}</div>
+    ${window.XZ2 ? XZ2.settingsHtml() : ''}
+  </div>
   <div class="card">
     <div class="eyebrow">代禱提醒</div>
     <div class="field"><label for="tAm">早晨</label><input type="time" id="tAm" value="${S.amTime}"></div>

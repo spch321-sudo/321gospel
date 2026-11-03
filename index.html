@@ -339,6 +339,21 @@ hr.sep{border:0;border-top:1px solid var(--line);margin:18px 0}
 }
 
 .xz-sheet.full{height:100dvh;max-width:none;border-radius:0}
+/* 滿版小智頁（-xz1103）：整頁、頂部貼齊、問句欄固定在畫面最底、回答全寬、頂端摘要列可收合 */
+:root{--xz2-fs:calc(15px * var(--fs));--xz2-acc:var(--navy);--xz2-soft:var(--soft);--xz2-mut:var(--ink-2)}
+.xz-overlay{align-items:stretch;background:var(--bg)}
+.xz-sheet,.xz-sheet.full{height:100dvh;max-width:none;border-radius:0;margin:0}
+.xz-head{padding-top:calc(12px + var(--safe-t))}
+.xz-xzc{flex:0 0 auto;max-height:46vh;overflow:auto;-webkit-overflow-scrolling:touch;padding:8px 12px;background:var(--soft);border-bottom:1px solid var(--line)}
+.xz-xzc .xz2c{margin:0}
+.xz-msg .xz-bub{max-width:100%}
+.xz-msg:not(.me){display:block}
+.xz-msg:not(.me) .xz-bub{width:100%}
+.xz-foot{order:5}
+body:has(.xz-overlay) #gxuFab{display:none!important}
+.xz-note{order:4}
+.xz-msg.me .xz-bub{max-width:90%}
+.xz2s{margin:0}
 .xz-tools{padding:8px 12px}
 .xz-colb .xz-sum{display:block;color:var(--ink-2);font-size:calc(16px * var(--fs) * var(--xzf,1));line-height:1.7}
 .xz-colb{opacity:.92}
@@ -652,7 +667,7 @@ window.I18N = {
 })();
 </script>
 <script>
-const APPVER = '4.9.3-k3m-vp1023-gx1103-co1-up1103';
+const APPVER = '4.9.3-k3m-vp1023-gx1103-co1-up1103-xz1103';
 
 /* =========================================================
    321 福音同行  ——  國度321空中團契
@@ -953,15 +968,31 @@ window.__G = { S, saveS, DB, LS, C, STORES, $, uid, esc, nl2br, todayISO, daysSi
 
 </script>
 
-<script defer src="app-1.js?v=4.9.2-k3m-vp1023-gx1103-co1"></script>
-<script defer src="app-2.js?v=4.9.2-k3m-vp1023-gx1103-co1"></script>
-<script defer src="app-2a.js?v=4.9.2-k3m-vp1023-gx1103-co1"></script>
-<script defer src="app-2b.js?v=4.9.2-k3m-vp1023-gx1103-co1"></script>
-<script defer src="app-2c.js?v=4.9.2-k3m-vp1023-gx1103-co1"></script>
-<script defer src="app-2d.js?v=4.9.2-k3m-vp1023-gx1103-co1"></script>
-<script defer src="app-2e.js?v=4.9.2-k3m-vp1023-gx1103-co1"></script>
-<script defer src="app-voice.js?v=4.9.2-k3m-vp1023-gx1103-co1"></script>
-<script defer src="app-gx.js?v=4.9.2-k3m-vp1023-gx1103-co1"></script>
+<script src="xz2.js?v=4.9.3-k3m-vp1023-gx1103-co1-up1103-xz1103"></script>
+<script id="XZ2I">
+/* XZ2 · 小智最新功能共用套件（-xz1103）：回答對象十種、回答長度五段、讀者資料、慕道友信仰背景、設定頁區塊、小智頁摘要列 */
+XZ2.init({
+  app: 'gospel', pfx: 'gs321-',
+  lang: function () { return (window.I18N && window.I18N.lang) || 'tc'; },
+  /* 舊的三段長度（簡要／適中／詳細，存在 xzLen）第一次自動遷移成新五段 */
+  legacyLen: function () { try { return JSON.parse(localStorage.getItem('xzLen') || '""'); } catch (e) { return ''; } },
+  ctxWord: '談話脈絡', ctxWordZs: '谈话脉络', ctxWordEn: 'the conversation context',
+  qsLabel: ['對象範例題', '对象范例题', 'Examples for me'],
+  reAnswer: function (m) { try { return window.__xzReAnswer ? window.__xzReAnswer(m) : false; } catch (e) { return false; } },
+  onAsk: function (q) { try { if (window.__xzAsk) window.__xzAsk(q); } catch (e) {} },
+  toast: function (m) { try { window.__G.toast(m); } catch (e) {} }
+});
+XZ2.watchScroll('#xz-msgs');
+</script>
+<script defer src="app-1.js?v=4.9.3-k3m-vp1023-gx1103-co1-up1103-xz1103"></script>
+<script defer src="app-2.js?v=4.9.3-k3m-vp1023-gx1103-co1-up1103-xz1103"></script>
+<script defer src="app-2a.js?v=4.9.3-k3m-vp1023-gx1103-co1-up1103-xz1103"></script>
+<script defer src="app-2b.js?v=4.9.3-k3m-vp1023-gx1103-co1-up1103-xz1103"></script>
+<script defer src="app-2c.js?v=4.9.3-k3m-vp1023-gx1103-co1-up1103-xz1103"></script>
+<script defer src="app-2d.js?v=4.9.3-k3m-vp1023-gx1103-co1-up1103-xz1103"></script>
+<script defer src="app-2e.js?v=4.9.3-k3m-vp1023-gx1103-co1-up1103-xz1103"></script>
+<script defer src="app-voice.js?v=4.9.3-k3m-vp1023-gx1103-co1-up1103-xz1103"></script>
+<script defer src="app-gx.js?v=4.9.3-k3m-vp1023-gx1103-co1-up1103-xz1103"></script>
 
 <script id="gxuScript">/* ===== GXU 美圖工作室（獨立版，v1.3.202610201200）：不依賴本 App 的內部結構，自帶狀態、我的作品與入口 ===== */
 (function () {
@@ -4333,8 +4364,8 @@ window.GXR_SCM={"m":["丟並乾亂亙亞佈佔併來係俱倉個們倖倫偉側�
 })();
 </script>
 <script>window.CR321_CFG={pfx:'gs321-',names:{zh:'321福音同行',zs:'321福音同行',en:'321 Gospel Companion'},root:function(){return document.getElementById('view')||document.body},top:function(){var s=document.getElementById('sheet');return(s&&s.className.indexOf('hidden')<0)?s.querySelector('header.topbar'):document.querySelector('header.topbar')},scroller:function(){var s=document.getElementById('sheet');return(s&&s.className.indexOf('hidden')<0)?document.getElementById('sheetView'):window},nav:function(){var G=window.__G,R=G&&G.R;if(!R)return null;if(['today','tools','cards','learn'].indexOf(R.tab)<0)return null;var SH={handsIndex:[],handsHand:['id'],handsFinger:['h','i'],gospel:[],slides:['i'],script:['id'],decision:[],cost:[],faq:['cat'],ice:[],frustration:[],track:['id'],lesson:['t','l'],res:[],prayers:['focus'],cards:[],tenIndex:[],tenFlow:[],tenIce:[],tenFive:[],tenOne:['id'],tenTurn:['id'],tenGrow:[],blIndex:[],blHow:[]};var st=[];for(var i=0;i<R.stack.length;i++){var e=R.stack[i],ks=SH[e.name];if(!ks)return null;var a={};for(var j=0;j<ks.length;j++){var v=e.arg&&e.arg[ks[j]];if(v!=null){if(typeof v!=='string'&&typeof v!=='number')return null;if(String(v).length>60)return null;a[ks[j]]=v}}st.push([e.name,a,String(e.title||'').slice(0,40)])}return st.length?{tab:R.tab,st:st}:{tab:R.tab}},go:function(o){var G=window.__G,R=G.R;try{G.TTS&&G.TTS.stop&&G.TTS.stop()}catch(e){}if(R.tab!==o.tab){G.go(o.tab)}else if(R.stack.length){G.closeSheet()}var st=o.st||[];for(var i=0;i<st.length;i++)G.push(st[i][0],st[i][1],st[i][2])}};</script>
-<script src="coread.js?v=4.9.2-k3m-vp1023-gx1103-co1"></script>
+<script src="coread.js?v=4.9.3-k3m-vp1023-gx1103-co1-up1103-xz1103"></script>
 <script>window.UPD321_PFX=["g321-"];window.UPD321_LANG=function(){var l=window.I18N&&I18N.lang;return l==="en"?"en":(l==="sc"?"sc":"tc");};</script>
-<script src="upd321.js?v=4.9.3-k3m-vp1023-gx1103-co1-up1103"></script>
+<script src="upd321.js?v=4.9.3-k3m-vp1023-gx1103-co1-up1103-xz1103"></script>
 </body>
 </html>
