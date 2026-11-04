@@ -877,6 +877,8 @@ function wireFab() {
 ACTS.openXiaozhi = function () { open(); };
 /* 供畫線面板「問小智」使用 */
 window.__xzAsk = async function (t) { await open(); send(t); };
+/* xzm.js（小智回答逐句跟讀／畫線）的小掛鉤：只暴露聊天物件、重畫與開啟，不改任何既有行為（chat.msgs 會被「重新開始」整個換掉，所以用函式取） */
+window.__xzHost = { chat: function () { return chat; }, draw: function () { draw(); }, open: function () { return open(); } };
 ACTS.xzAskPerson = function (d) { open(d.id); };
 
 var _tools = VIEWS.tools;

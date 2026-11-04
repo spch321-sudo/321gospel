@@ -5,10 +5,10 @@
      clients.claim，通知所有頁面；背景中的舊頁面直接帶到新版
    ‧ fetch：HTML／JS／JSON／CSS 網路優先（no-cache），離線才用快取；圖片等快取優先；
      version.json 永遠 no-store；影音與 Range 請求不攔截；範圍外（其他 App）與跨網域不碰 */
-var VER = '4.9.3-k3m-vp1023-gx1103-co1-up1103-xz1103';
+var VER = '4.9.3-k3m-vp1023-gx1103-co1-up1103-xz1103-xzm1103';
 var PFX = 'g321-';
 var V = PFX + VER;
-var SHELL = ["./", "./index.html", "./a01-new-life.html", "./app-1.js", "./app-2.js", "./app-2a.js", "./app-2b.js", "./app-2c.js", "./app-2d.js", "./app-2e.js", "./app-voice.js", "./app-gx.js", "./xz2.js", "./coread.js", "./peerjs.min.js", "./lang-en.json", "./lang-enp.json", "./lang-sc.json", "./manifest.json", "./icon-180.png", "./icon-192.png", "./icon-512.png", "./icon-maskable-512.png", "./upd321.js"];
+var SHELL = ["./", "./index.html", "./a01-new-life.html", "./app-1.js", "./app-2.js", "./app-2a.js", "./app-2b.js", "./app-2c.js", "./app-2d.js", "./app-2e.js", "./app-voice.js", "./app-gx.js", "./xz2.js", "./xzm.js", "./coread.js", "./peerjs.min.js", "./lang-en.json", "./lang-enp.json", "./lang-sc.json", "./manifest.json", "./icon-180.png", "./icon-192.png", "./icon-512.png", "./icon-maskable-512.png", "./upd321.js"];
 var HOME = 'index.html';
 
 function mine(k) { return k.indexOf(PFX) === 0; }
