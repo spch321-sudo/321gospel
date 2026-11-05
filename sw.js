@@ -4,8 +4,9 @@
    ‧ activate：只刪自己前綴（g321-）的舊快取——同一個 github.io 網域還有其他 321 App，共用 Cache Storage 不可全刪；
      clients.claim，通知所有頁面；背景中的舊頁面直接帶到新版
    ‧ fetch：HTML／JS／JSON／CSS 網路優先（no-cache），離線才用快取；圖片等快取優先；
-     version.json 永遠 no-store；影音與 Range 請求不攔截；範圍外（其他 App）與跨網域不碰 */
-var VER = '4.9.3-k3m-vp1023-gx1103-co1-up1103-xz1103-xzm1103';
+     version.json 永遠 no-store；影音與 Range 請求不攔截；範圍外（其他 App）與跨網域不碰
+   ‧ 1 秒競速（-rf1105）：網路超過 1 秒沒回就先用快取，網路那份繼續下載並更新快取；tts-audio 是朗讀音檔快取，不以 PFX 開頭，不會被清 */
+var VER = '4.9.3-k3m-vp1023-gx1103-co1-up1103-xz1103-xzm1103-rf1105';
 var PFX = 'g321-';
 var V = PFX + VER;
 var SHELL = ["./", "./index.html", "./a01-new-life.html", "./app-1.js", "./app-2.js", "./app-2a.js", "./app-2b.js", "./app-2c.js", "./app-2d.js", "./app-2e.js", "./app-voice.js", "./app-gx.js", "./xz2.js", "./xzm.js", "./coread.js", "./peerjs.min.js", "./lang-en.json", "./lang-enp.json", "./lang-sc.json", "./manifest.json", "./icon-180.png", "./icon-192.png", "./icon-512.png", "./icon-maskable-512.png", "./upd321.js"];
@@ -63,17 +64,7 @@ self.addEventListener('fetch', function (e) {
   var nav = r.mode === 'navigate' || /\.html$/.test(p) || /\/$/.test(p);
   if (nav || /\.(json|js|css|webmanifest)$/.test(p)) {
     var key = keyOf(u.href);
-    e.respondWith(fetch(u.origin + p + u.search, { cache: 'no-cache', credentials: 'same-origin' }).then(function (resp) {
-      if (resp && resp.ok) { var cp = resp.clone(); caches.open(V).then(function (c) { c.put(key, cp); }); }
-      return resp;
-    })['catch'](function () {
-      return caches.match(key).then(function (h) {
-        if (h) return h;
-        return caches.match(r, { ignoreSearch: true }).then(function (h2) {
-          return h2 || (nav ? caches.match(u.origin + scope + HOME) : undefined);
-        });
-      });
-    }));
+    e.respondWith(shellFetch(r, u, p, key, nav, scope));
     return;
   }
 
@@ -85,3 +76,25 @@ self.addEventListener('fetch', function (e) {
   }));
 });
 
+/* 網路優先，但最多等 SHELL_WAIT 毫秒：超過就先用「完全相同」的快取（沒有快取就繼續等網路）；網路那份回來後更新快取。
+   只有導覽請求才可以退回首頁（程式檔退回 HTML 會被當 JS 執行而出錯）。 */
+var SHELL_WAIT = 1000;
+function cacheLookup(r, u, key, nav, scope) {
+  return caches.match(key).then(function (h) {
+    if (h) return h;
+    return caches.match(r, { ignoreSearch: true }).then(function (h2) {
+      return h2 || (nav ? caches.match(u.origin + scope + HOME) : undefined);
+    });
+  });
+}
+function shellFetch(r, u, p, key, nav, scope) {
+  var net = fetch(u.origin + p + u.search, { cache: 'no-cache', credentials: 'same-origin' }).then(function (resp) {
+    if (resp && resp.ok) { var cp = resp.clone(); caches.open(V).then(function (c) { c.put(key, cp); }); }
+    return resp;
+  });
+  var netSafe = net['catch'](function () { return cacheLookup(r, u, key, nav, scope).then(function (h) { if (h) return h; return net; }); });
+  var timer = new Promise(function (res) {
+    setTimeout(function () { cacheLookup(r, u, key, nav, scope).then(function (h) { if (h) res(h); }); }, SHELL_WAIT);
+  });
+  return Promise.race([netSafe, timer]);
+}

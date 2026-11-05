@@ -57,7 +57,7 @@
   var origStop = TTS.stop.bind(TTS);
 
   var SILENT = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA=';
-  var rv = { audio:null, cache:{}, unlocked:false, queue:[], idx:0, token:0, active:false };
+  var rv = { audio:null, cache:{}, unlocked:false, queue:[], idx:0, token:0, active:false, gen:0, wd:null, go:null };
 
   function audio() {
     if (!rv.audio) {
@@ -143,36 +143,46 @@
     });
   }
 
-  function fetchPiece(piece) {
+  var rvDownUntil = 0, rvFailed = false;
+  /* 看門狗：瀏覽器在背景／鎖屏悄悄丟掉 onended 時，依這一段實際長度保底往下一段推進 */
+  function wdClear() { if (rv.wd) { clearTimeout(rv.wd); rv.wd = null; } }
+  function wdArm(fn, ms) { wdClear(); rv.wd = setTimeout(function () { rv.wd = null; fn(); }, ms); }
+  function fetchPiece(piece, quick) {
     var key = voiceName() + '|' + rateAttr() + '|' + piece;
     if (rv.cache[key]) return Promise.resolve(rv.cache[key]);
     return new Promise(function (res, rej) {
       cacheGet(key, function (blob) {
         if (blob) { try { var u = URL.createObjectURL(blob); rv.cache[key] = u; res(u); return; } catch (e) {} }
+        if (Date.now() < rvDownUntil) { rej(new Error('cloud paused')); return; }
         function ask(vn) {
+          var ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+          var to = ctrl ? setTimeout(function () { try { ctrl.abort(); } catch (e) {} }, quick ? 6000 : 15000) : null;
           return fetch(EP, { method:'POST', headers:{ 'Content-Type':'application/json' },
+            signal: ctrl ? ctrl.signal : undefined,
             body: JSON.stringify({ voice: vn, rate: rateAttr(),
                                    sil:140, silc:140, sile:260, text: piece }) })
-            .then(function (r) { if (!r.ok) throw new Error('TTS ' + r.status); return r.blob(); });
+            .then(function (r) { if (!r.ok) throw new Error('TTS ' + r.status); return r.blob(); })
+            .then(function (b) { if (to) clearTimeout(to); return b; }, function (e) { if (to) clearTimeout(to); throw e; });
         }
         ask(voiceName())
-          .catch(function (e) {                    /* 這個聲音後端不收，改用保底聲音再試一次 */
-            if (voiceName() === SAFE) throw e;
+          .catch(function (e) {                    /* 這個聲音後端不收，改用保底聲音再試一次（快速模式不重試） */
+            if (voiceName() === SAFE || quick) throw e;
             return ask(SAFE);
           })
           .then(function (b) {
+            rvDownUntil = 0;
             try { cachePut(key, b); } catch (e) {}
             var u; try { u = URL.createObjectURL(b); rv.cache[key] = u; } catch (e) {}
             res(u);
           })
-          .catch(rej);
+          .catch(function (e) { rvDownUntil = Date.now() + 20000; rej(e); });
       });
     });
   }
 
   function rvStop() {
-    rv.token++; rv.active = false; rv.queue = []; rv.idx = 0;
-    if (rv.audio) { try { rv.audio.pause(); } catch (e) {} rv.audio.onended = null; rv.audio.onerror = null; }
+    rv.token++; rv.active = false; rv.queue = []; rv.idx = 0; rv.gen++; rv.go = null; wdClear();
+    if (rv.audio) { try { rv.audio.pause(); } catch (e) {} rv.audio.onended = null; rv.audio.onerror = null; rv.audio.ontimeupdate = null; }
     try { if (navigator.mediaSession) navigator.mediaSession.playbackState = 'none'; } catch (e) {}
     if (window.GXR) { GXR.ttsState(''); }
   }
@@ -180,20 +190,23 @@
   /* 某一段抓不到，就用系統語音把這一段補完，唸完再接下一段 */
   function fallbackChunk(piece, cb) {
     if (!('speechSynthesis' in window)) { if (cb) cb(); return; }
+    var g = ++rv.gen, done = false;
+    function fin() { if (done || g !== rv.gen) return; done = true; wdClear(); if (cb) cb(); }
     try {
       var u = new SpeechSynthesisUtterance(piece);
       u.lang = (window.I18N && window.I18N.ttsLang) ? window.I18N.ttsLang() : 'zh-TW';
       u.rate = +S.ttsRate || 0.95;
-      u.onend = cb; u.onerror = cb;
+      u.onend = fin; u.onerror = fin;
+      wdArm(function () { try { speechSynthesis.cancel(); } catch (e) {} fin(); }, Math.min(120000, Math.max(15000, piece.length * 480 / (u.rate || 1) + 10000)));
       speechSynthesis.speak(u);
-    } catch (e) { if (cb) cb(); }
+    } catch (e) { fin(); }
   }
 
   function rvSpeak(text) {
     unlock();
     var q = chunks(window.GXR ? GXR.pron(text) : text);
     if (!q.length) { toast('這一頁沒有可朗讀的內容'); return; }
-    rv.queue = q; rv.idx = 0; rv.active = true;
+    rv.queue = q; rv.idx = 0; rv.active = true; rvFailed = false;
     var my = ++rv.token, a = audio();
     try {
       if (navigator.mediaSession && window.MediaMetadata) {
@@ -204,17 +217,27 @@
     function playAt(i) {
       if (my !== rv.token) return;
       if (i >= rv.queue.length) { rvStop(); return; }
-      fetchPiece(rv.queue[i]).then(function (url) {
-        if (my !== rv.token) return;
-        a.onended = null; a.onerror = null; a.src = url;
-        a.onended = function () { if (my === rv.token) playAt(i + 1); };
+      rv.idx = i; wdClear();
+      fetchPiece(rv.queue[i], i === 0 || rvFailed).then(function (url) {
+        if (my !== rv.token || rv.idx !== i) return;
+        rvFailed = false;
+        a.onended = null; a.onerror = null; a.ontimeupdate = null; a.src = url;
+        a.ontimeupdate = function () {
+          if (my !== rv.token || rv.idx !== i) return;
+          var d = a.duration;
+          if (d && isFinite(d) && d > 0) wdArm(function () { if (my === rv.token && rv.idx === i) playAt(i + 1); }, Math.max(3000, (d - a.currentTime) * 1000 + 5000));
+        };
+        wdArm(function () { if (my === rv.token && rv.idx === i) playAt(i + 1); }, Math.min(120000, Math.max(15000, rv.queue[i].length * 480 + 10000)));
+        a.onended = function () { wdClear(); a.ontimeupdate = null; if (my === rv.token) playAt(i + 1); };
         a.onerror = function () { fallbackChunk(rv.queue[i], function () { if (my === rv.token) playAt(i + 1); }); };
         var p = a.play();
         if (p && p.catch) p.catch(function () {
           fallbackChunk(rv.queue[i], function () { if (my === rv.token) playAt(i + 1); });
         });
-        if (rv.queue[i + 1]) fetchPiece(rv.queue[i + 1]).catch(function () {});
+        if (rv.queue[i + 1]) fetchPiece(rv.queue[i + 1], rvFailed).catch(function () {});
       }).catch(function (err) {
+        if (my !== rv.token || rv.idx !== i) return;
+        rvFailed = true;
         if (i === 0) {                       /* 一開始就連不上：整段交回原本的引擎 */
           rvStop();
           toast('真人語音連不上（' + (err && err.message ? err.message : '無回應') + '），改用系統語音');
@@ -224,6 +247,13 @@
         fallbackChunk(rv.queue[i], function () { if (my === rv.token) playAt(i + 1); });
       });
     }
+    /* 鎖屏／耳機的上一段、下一段 */
+    rv.go = function (i) {
+      wdClear(); rv.gen++;
+      try { a.onended = null; a.onerror = null; a.ontimeupdate = null; a.pause(); } catch (e) {}
+      try { if ('speechSynthesis' in window) speechSynthesis.cancel(); } catch (e) {}
+      playAt(i);
+    };
     playAt(0);
   }
 
@@ -245,7 +275,8 @@
     title: function () { try { var t = G.R.stack[G.R.stack.length - 1]; return t && t.title || ''; } catch (e) { return ''; } },
     pause: function () { try { if (rv.audio && !rv.audio.paused) { rv.audio.pause(); } if ('speechSynthesis' in window && speechSynthesis.speaking) { speechSynthesis.pause(); } } catch (e) {} },
     resume: function () { try { if (rv.audio && rv.audio.paused && rv.audio.src && rv.active) { var p = rv.audio.play(); if (p && p.then) { p.then(null, function () {}); } } if ('speechSynthesis' in window && speechSynthesis.paused) { speechSynthesis.resume(); } } catch (e) {} },
-    stop: function () { TTS.stop(); }
+    stop: function () { TTS.stop(); },
+    jump: function (d) { if (!rv.active || !rv.go || !rv.queue.length) return false; rv.go(Math.max(0, Math.min(rv.queue.length - 1, rv.idx + d))); return true; }
   };
   window.__rvClearCache = cacheClear;
 

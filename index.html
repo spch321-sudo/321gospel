@@ -667,7 +667,7 @@ window.I18N = {
 })();
 </script>
 <script>
-const APPVER = '4.9.3-k3m-vp1023-gx1103-co1-up1103-xz1103-xzm1103';
+const APPVER = '4.9.3-k3m-vp1023-gx1103-co1-up1103-xz1103-xzm1103-rf1105';
 
 /* =========================================================
    321 福音同行  ——  國度321空中團契
@@ -968,7 +968,7 @@ window.__G = { S, saveS, DB, LS, C, STORES, $, uid, esc, nl2br, todayISO, daysSi
 
 </script>
 
-<script src="xz2.js?v=4.9.3-k3m-vp1023-gx1103-co1-up1103-xz1103-xzm1103"></script>
+<script src="xz2.js?v=4.9.3-k3m-vp1023-gx1103-co1-up1103-xz1103-xzm1103-rf1105"></script>
 <script id="XZ2I">
 /* XZ2 · 小智最新功能共用套件（-xz1103）：回答對象十種、回答長度五段、讀者資料、慕道友信仰背景、設定頁區塊、小智頁摘要列 */
 XZ2.init({
@@ -984,15 +984,15 @@ XZ2.init({
 });
 XZ2.watchScroll('#xz-msgs');
 </script>
-<script defer src="app-1.js?v=4.9.3-k3m-vp1023-gx1103-co1-up1103-xz1103-xzm1103"></script>
-<script defer src="app-2.js?v=4.9.3-k3m-vp1023-gx1103-co1-up1103-xz1103-xzm1103"></script>
-<script defer src="app-2a.js?v=4.9.3-k3m-vp1023-gx1103-co1-up1103-xz1103-xzm1103"></script>
-<script defer src="app-2b.js?v=4.9.3-k3m-vp1023-gx1103-co1-up1103-xz1103-xzm1103"></script>
-<script defer src="app-2c.js?v=4.9.3-k3m-vp1023-gx1103-co1-up1103-xz1103-xzm1103"></script>
-<script defer src="app-2d.js?v=4.9.3-k3m-vp1023-gx1103-co1-up1103-xz1103-xzm1103"></script>
-<script defer src="app-2e.js?v=4.9.3-k3m-vp1023-gx1103-co1-up1103-xz1103-xzm1103"></script>
-<script defer src="app-voice.js?v=4.9.3-k3m-vp1023-gx1103-co1-up1103-xz1103-xzm1103"></script>
-<script defer src="app-gx.js?v=4.9.3-k3m-vp1023-gx1103-co1-up1103-xz1103-xzm1103"></script>
+<script defer src="app-1.js?v=4.9.3-k3m-vp1023-gx1103-co1-up1103-xz1103-xzm1103-rf1105"></script>
+<script defer src="app-2.js?v=4.9.3-k3m-vp1023-gx1103-co1-up1103-xz1103-xzm1103-rf1105"></script>
+<script defer src="app-2a.js?v=4.9.3-k3m-vp1023-gx1103-co1-up1103-xz1103-xzm1103-rf1105"></script>
+<script defer src="app-2b.js?v=4.9.3-k3m-vp1023-gx1103-co1-up1103-xz1103-xzm1103-rf1105"></script>
+<script defer src="app-2c.js?v=4.9.3-k3m-vp1023-gx1103-co1-up1103-xz1103-xzm1103-rf1105"></script>
+<script defer src="app-2d.js?v=4.9.3-k3m-vp1023-gx1103-co1-up1103-xz1103-xzm1103-rf1105"></script>
+<script defer src="app-2e.js?v=4.9.3-k3m-vp1023-gx1103-co1-up1103-xz1103-xzm1103-rf1105"></script>
+<script defer src="app-voice.js?v=4.9.3-k3m-vp1023-gx1103-co1-up1103-xz1103-xzm1103-rf1105"></script>
+<script defer src="app-gx.js?v=4.9.3-k3m-vp1023-gx1103-co1-up1103-xz1103-xzm1103-rf1105"></script>
 
 <script id="gxuScript">/* ===== GXU 美圖工作室（獨立版，v1.3.202610201200）：不依賴本 App 的內部結構，自帶狀態、我的作品與入口 ===== */
 (function () {
@@ -1141,6 +1141,45 @@ var GXS = (function () {
     plain: { n: ['純白簡潔', 'Pure White'], bg: ['#FFFFFF', '#FFFFFF', '#FFFFFF'], glow: 'rgba(0,0,0,0)', ink: '#23211C', accent: '#1F4D3D', gold: '#A9762F', sub: '#6B6255', frame: 'rgba(31,77,61,.22)' }
   };
   const TPL_ORDER = ['plain', 'navy', 'paper', 'dawn', 'grace', 'rose', 'sky', 'linen', 'night'];
+
+  /* ── v2.62–v2.63 美圖版面可讀性（-rf1105）：輔助色對比 ≥4.5:1、依相片亮度的遮罩、放不下的提醒、一鍵調整、有相片輸出 JPEG ── */
+  const rfHex = h => { h = String(h).replace('#', ''); return [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16)); };
+  const rfLum = (r, g, b) => { const f = v => { v /= 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); }; return .2126 * f(r) + .7152 * f(g) + .0722 * f(b); };
+  const rfCR = (a, b) => { const L1 = rfLum(a[0], a[1], a[2]), L2 = rfLum(b[0], b[1], b[2]); return (Math.max(L1, L2) + .05) / (Math.min(L1, L2) + .05); };
+  Object.keys(TPL).forEach(k => {
+    const t0 = TPL[k], ink = rfHex(t0.ink), bgs = t0.bg.map(rfHex);
+    let sub = rfHex(t0.sub);
+    const worst = c => Math.min.apply(null, bgs.map(b => rfCR(c, b)));
+    for (let n = 0; worst(sub) < 4.5 && n < 24; n++) sub = sub.map((v, i) => Math.round(v + (ink[i] - v) * .12));
+    t0.sub = '#' + sub.map(v => (v < 16 ? '0' : '') + v.toString(16)).join('');
+  });
+  /* 相片上的遮罩：上／中／下三段，依各段實際亮度加深到文字對比 ≥5:1（上限 .9） */
+  function rfScrim(img, Tp, bg) {
+    const base = [.46, .66, .56], out = base.slice();
+    try {
+      const c = document.createElement('canvas'); c.width = 8; c.height = 12;
+      const x = c.getContext('2d'); coverDraw2(x, img, 0, 0, 8, 12);
+      const d = x.getImageData(0, 0, 8, 12).data;
+      const inks = [rfHex(Tp.ink), rfHex(Tp.accent)];
+      for (let b = 0; b < 3; b++) {
+        const cells = [];
+        for (let row = b * 4; row < b * 4 + 4; row++) for (let col = 0; col < 8; col++) { const i = (row * 8 + col) * 4; cells.push([d[i], d[i + 1], d[i + 2]]); }
+        let a = base[b];
+        for (; a < .9; a += .03) {
+          let worst = 99;
+          for (const p of cells) {
+            const m = [p[0] * (1 - a) + bg[0] * a, p[1] * (1 - a) + bg[1] * a, p[2] * (1 - a) + bg[2] * a];
+            for (const ik of inks) worst = Math.min(worst, rfCR(m, ik));
+          }
+          if (worst >= 5) break;
+        }
+        out[b] = +Math.min(.9, a).toFixed(2);
+      }
+    } catch (e) { }
+    return out;
+  }
+  let cardOverflow = '';   // ''／'note'（領受放不下已省略）／'verse'（經文太長已縮到最小）
+  const hasPhotoOut = () => !!(photoImg || stkImg);
   const SIZES = { p: [1080, 1920, ['直式 9:16', 'Portrait 9:16']], t: [1080, 1350, ['直式 4:5', 'Portrait 4:5']], s: [1080, 1080, ['方形', 'Square']], w: [1920, 1080, ['橫式 16:9', 'Landscape 16:9']], f: [1440, 1080, ['橫式 4:3', 'Landscape 4:3']] };
   const BORDERS = [['classic', ['古典雙框', 'Classic']], ['corner', ['雅緻角飾', 'Corners']], ['inline', ['內斂細線', 'Fine line']], ['dots', ['珠鏈點框', 'Dots']], ['ornate', ['華麗花角', 'Ornate']], ['none', ['無邊框', 'None']]];
   const FS = [[0.9, ['小一點', 'Smaller']], [1, ['標準', 'Standard']], [1.2, ['大', 'Large']], [1.45, ['特大', 'Extra large']], [1.7, ['超大', 'Huge']]];
@@ -1402,7 +1441,8 @@ var GXS = (function () {
 
   /* 一般卡片（照互動聖經 drawVerseCard：背景／貼紙／原圖） */
   function drawCard(cv, W, H) {
-    if (isFull()) return drawFull(cv, W, H);
+    if (isFull()) { cardOverflow = ''; return drawFull(cv, W, H); }
+    cardOverflow = '';
     const ctx = cv.getContext('2d'); cv.width = W; cv.height = H;
     const Tp = inkT(TPL[st().tpl]);
     const Sm = Math.min(W, H), F = Sm / 1080, pad = Math.round(Sm * .085), iw = W - pad * 2;
@@ -1450,10 +1490,10 @@ var GXS = (function () {
       coverDraw2(ctx, photoImg, 0, 0, W, H);
       const hx = Tp.bg[1].replace('#', '');
       const R0 = parseInt(hx.slice(0, 2), 16), G0 = parseInt(hx.slice(2, 4), 16), B0 = parseInt(hx.slice(4, 6), 16);
-      const scg = ctx.createLinearGradient(0, 0, 0, H);
-      scg.addColorStop(0, `rgba(${R0},${G0},${B0},0.46)`);
-      scg.addColorStop(.5, `rgba(${R0},${G0},${B0},0.66)`);
-      scg.addColorStop(1, `rgba(${R0},${G0},${B0},0.56)`);
+      const scg = ctx.createLinearGradient(0, 0, 0, H), al = rfScrim(photoImg, Tp, [R0, G0, B0]);
+      scg.addColorStop(0, `rgba(${R0},${G0},${B0},${al[0]})`);
+      scg.addColorStop(.5, `rgba(${R0},${G0},${B0},${al[1]})`);
+      scg.addColorStop(1, `rgba(${R0},${G0},${B0},${al[2]})`);
       ctx.fillStyle = scg; ctx.fillRect(0, 0, W, H);
     }
     const rg = ctx.createRadialGradient(W * .84, H * .10, 10, W * .84, H * .10, W * .75);
@@ -1527,9 +1567,10 @@ var GXS = (function () {
         nl = nl.slice(0, fit); let last = nl[fit - 1]; ctx.font = `${ns}px ${sans}`;
         while (last.length > 1 && ctx.measureText(last + '…').width > tiw) last = last.slice(0, -1);
         nl[fit - 1] = last.replace(/[，。、；：,.;:\s]+$/, '') + '…';
-        total = fixed + nl.length * ns * 1.76;
+        total = fixed + nl.length * ns * 1.76; cardOverflow = 'note';
       }
     }
+    if (total > room + 1) cardOverflow = 'verse';
     let y = topRoom + Math.max(0, (room - total) / 2);
     const vh = vs * .9 + vl.length * vs * 1.52 + Math.round(64 * FT), nh = total - vh;
     let vx = 0, vy = 0, nx = 0, ny = 0;
@@ -1681,13 +1722,37 @@ var GXS = (function () {
       try { drawCard(cv, d[0], d[1]); cardURL = cv.toDataURL('image/png'); } catch (e) { cardURL = ''; }
       const pv = q1('#gxsPv');
       if (pv && cardURL) { pv.src = cardURL; pv.style.aspectRatio = d[0] + ' / ' + d[1]; }
+      warnPaint();
     }, 40);
+  }
+  function warnPaint() {
+    const el = q1('#gxsWarn'); if (!el) return;
+    el.style.display = cardOverflow ? '' : 'none';
+    if (cardOverflow) el.textContent = cardOverflow === 'note'
+      ? T('⚠️ 這張卡片放不下全部的領受文字，已先縮短；想完整呈現，可改選較高的尺寸（直式 9:16）或把領受寫短一點。', '⚠️ The card cannot fit the whole note, so it was shortened. Try Portrait 9:16 or a shorter note.')
+      : T('⚠️ 經文比較長，字已縮到最小；建議改選直式 9:16，或只選一兩節。', '⚠️ The verse is long and already at the smallest size. Try Portrait 9:16 or pick fewer verses.');
+  }
+  /* 依經文與領受長度，試幾組尺寸／字級，挑第一組放得下的 */
+  function cardAutoFit() {
+    if (!item) return '';
+    if (isFull()) return T('整張原圖不需要調整', 'A whole-photo card needs no adjusting');
+    const g = st(), cands = [['t', 1.45], ['p', 1.45], ['t', 1.2], ['p', 1.2], ['p', 1], ['p', .9]], sz0 = g.size, fs0 = g.fs;
+    let pick = cands[cands.length - 1];
+    for (const c of cands) {
+      g.size = c[0]; g.fs = c[1];
+      const cv = document.createElement('canvas'); try { drawCard(cv, Math.round(SIZES[c[0]][0] / 2), Math.round(SIZES[c[0]][1] / 2)); } catch (e) { }
+      if (!cardOverflow) { pick = c; break; }
+    }
+    g.size = pick[0]; g.fs = pick[1];
+    if (sz0 === pick[0] && fs0 === pick[1]) return T('目前的尺寸與字級已經合適', 'Current size and text size already fit');
+    return T('已選「', 'Chose "') + L2(SIZES[pick[0]][2]) + T('」與合適字級', '" and a fitting text size');
   }
   function cardBlob() {
     const d = dims(), cv = document.createElement('canvas');
     drawCard(cv, d[0], d[1]);
     return new Promise(r => {
-      try { cv.toBlob(b => r(b), 'image/png'); }
+      /* 有相片的卡片輸出成 JPEG（品質 .92，檔案小很多）；純色卡片維持 PNG 保持銳利 */
+      try { if (hasPhotoOut()) cv.toBlob(b => r(b), 'image/jpeg', .92); else cv.toBlob(b => r(b), 'image/png'); }
       catch (e) { r(null); }
     });
   }
@@ -2960,6 +3025,7 @@ function mx_strBytes(s){const a=new Uint8Array(s.length);for(let i=0;i<s.length;
       <p class="gxlab">${esc(T('外框', 'Border'))}</p>${chips(BORDERS.map(b => [b[0], L2(b[1])]), g.border, 'border')}
       <p class="gxlab">${esc(T('尺寸', 'Size'))}</p>${chips(Object.keys(SIZES).map(k => [k, L2(SIZES[k][2])]), g.size, 'size')}
       <p class="gxlab">${esc(T('字級', 'Text size'))}</p>${chips(FS.map(f => [f[0], L2(f[1])]), g.fs, 'fs')}
+      <button class="btn" data-k="auto" style="margin:8px 0 2px;width:100%">${esc(T('✨ 一鍵調整：依經文長度自動選尺寸與字級', '✨ Auto-fit: pick the size and text size for this verse'))}</button>
       ${hint(T('字級會一起放大團體名稱、稱呼、經文、內文與署名。', 'Scales the group name, greeting, verse, text and signature together.'))}`;
   }
   function tabPhoto() {
@@ -3146,6 +3212,7 @@ function mx_strBytes(s){const a=new Uint8Array(s.length);for(let i=0;i<s.length;
     if (k === 'x') return close();
     if (k === 'save') return saveImg();
     if (k === 'share') return shareImg();
+    if (k === 'auto') { const m = cardAutoFit(); keep(); say(m); return paint(); }
     if (k === 'tpl' || k === 'size' || k === 'border') { g[k] = v; keep(); return paint(); }
     if (k === 'fs' || k === 'vol') { g[k] = +v; keep(); return paint(); }
     if (k === 'mc') { if (recOn()) return; g.mc = +v; keep(); return paint(); }
@@ -3193,9 +3260,9 @@ function mx_strBytes(s){const a=new Uint8Array(s.length);for(let i=0;i<s.length;
   }
   async function saveImg() {
     const b = await cardBlob(); if (!b) { say(T('請長按圖片儲存', 'Press and hold the picture to save')); return; }
-    const name = fileBase() + '.png';
+    const jpg = b.type === 'image/jpeg', name = fileBase() + (jpg ? '.jpg' : '.png');
     if (isIOS()) {
-      const f = new File([b], name, { type: 'image/png' });
+      const f = new File([b], name, { type: jpg ? 'image/jpeg' : 'image/png' });
       if (navigator.canShare && navigator.canShare({ files: [f] })) {
         say(T('在分享面板選「儲存影像」就會存進相簿', 'Choose “Save Image” to put it in Photos'));
         try { await navigator.share({ files: [f] }); return; } catch (e) { if (e && e.name === 'AbortError') return; }
@@ -3211,7 +3278,7 @@ function mx_strBytes(s){const a=new Uint8Array(s.length);for(let i=0;i<s.length;
   async function shareImg() {
     const b = await cardBlob();
     if (!b) return saveImg();
-    const f = new File([b], fileBase() + '.png', { type: 'image/png' });
+    const jpg = b.type === 'image/jpeg', f = new File([b], fileBase() + (jpg ? '.jpg' : '.png'), { type: jpg ? 'image/jpeg' : 'image/png' });
     if (navigator.canShare && navigator.canShare({ files: [f] })) {
       try { await navigator.share({ files: [f], text: sc(verseText() + (item.ref ? '\n—— ' + item.ref : '')) }); return; }
       catch (e) { if (e && e.name === 'AbortError') return; }
@@ -3272,6 +3339,7 @@ function mx_strBytes(s){const a=new Uint8Array(s.length);for(let i=0;i<s.length;
     EL.innerHTML = `<div class="gxscard">
       <div class="gxshead"><b>🖼 ${esc(T('美圖工作室', 'Card studio'))}</b><button class="ico" data-k="x" aria-label="close">✕</button></div>
       <div class="gxspv"><img id="gxsPv" alt=""></div>
+      <p class="xs" id="gxsWarn" style="display:none;margin:4px 0 6px;color:#B35A00;text-align:center"></p>
       <p class="xs muted" style="text-align:center;margin:4px 0 8px">${esc(T('長按圖片也可以直接儲存', 'You can also press and hold the picture to save'))}</p>
       <div class="gxacts"><button class="btn pri" data-k="share">↗ ${esc(T('分享', 'Share'))}</button><button class="btn" data-k="save">⬇ ${esc(T('存到手機', 'Save'))}</button></div>
       <div class="gxtabs">${TABS.map(x => `<button data-t="${x[0]}">${esc(T(x[1][0], x[1][1]))}</button>`).join('')}</div>
@@ -3772,6 +3840,7 @@ window.GXR_SCM={"m":["丟並乾亂亙亞佈佔併來係俱倉個們倖倫偉側�
         navigator.mediaSession.setActionHandler('play', function () { barToggle(true); });
         navigator.mediaSession.setActionHandler('pause', function () { barToggle(false); });
         navigator.mediaSession.setActionHandler('stop', function () { if (BR().stop) BR().stop(); });
+        try { navigator.mediaSession.setActionHandler('previoustrack', function () { if (BR().jump) BR().jump(-1); }); navigator.mediaSession.setActionHandler('nexttrack', function () { if (BR().jump) BR().jump(1); }); } catch (e2) {}
       }
       navigator.mediaSession.playbackState = barPaused ? 'paused' : 'playing';
     } catch (e) {}
@@ -3788,7 +3857,7 @@ window.GXR_SCM={"m":["丟並乾亂亙亞佈佔併來係俱倉個們倖倫偉側�
     var el = q1('#gxrBar');
     if (!el) {
       el = document.createElement('div'); el.id = 'gxrBar';
-      el.innerHTML = '<span class="gxbt">🔊 <b></b></span><button type="button" data-gxr-bar="pp" aria-label="pause">⏸</button><button type="button" data-gxr-bar="stop" aria-label="stop">⏹</button>';
+      el.innerHTML = '<span class="gxbt">🔊 <b></b></span><button type="button" data-gxr-bar="pp" aria-label="pause">⏸</button><button type="button" data-gxr-bar="sleep" aria-label="sleep timer" id="gxrSleep">⏲</button><button type="button" data-gxr-bar="stop" aria-label="stop">⏹</button>';
       document.body.appendChild(el);
     }
     return el;
@@ -3809,8 +3878,27 @@ window.GXR_SCM={"m":["丟並乾亂亙亞佈佔併來係俱倉個們倖倫偉側�
       speaking = false; barPaused = false;
       var e2 = q1('#gxrBar'); if (e2) e2.className = '';
       var e3 = q1('#spkbar'); if (e3) e3.className = '';
-      wlRelease(); msClear();
+      wlRelease(); msClear(); if (sleepMode) sleepClear();
     }
+  }
+
+  /* ── 睡前定時（v2.60.0）：關／15／30／60 分鐘；時間到先淡出 5 秒再停（停在原位） ── */
+  var SLEEP_MIN = [0, 15, 30, 60], sleepMode = 0, sleepT = null;
+  function sleepPaint() { var b = q1('#gxrSleep'); if (!b) return; b.textContent = '⏲' + (sleepMode ? SLEEP_MIN[sleepMode] : ''); b.classList.toggle('on', sleepMode > 0); }
+  function sleepClear() { if (sleepT) { clearTimeout(sleepT); sleepT = null; } sleepMode = 0; sleepPaint(); }
+  function sleepFire() {
+    sleepT = null; var a = null; try { a = BR().audio ? BR().audio() : null; } catch (e) {}
+    var v = 1, st = setInterval(function () {
+      v -= 0.2; try { if (a && v > 0) a.volume = Math.max(0, v); } catch (e) {}
+      if (v <= 0.001) { clearInterval(st); try { if (BR().stop) BR().stop(); } catch (e) {} try { if (a) a.volume = 1; } catch (e) {} sleepClear(); }
+    }, 1000);
+  }
+  function sleepCycle() {
+    if (sleepT) { clearTimeout(sleepT); sleepT = null; }
+    sleepMode = (sleepMode + 1) % SLEEP_MIN.length;
+    if (sleepMode) sleepT = setTimeout(sleepFire, SLEEP_MIN[sleepMode] * 60000);
+    sleepPaint();
+    toast(sleepMode ? T(SLEEP_MIN[sleepMode] + ' 分鐘後停止朗讀', 'Will stop in ' + SLEEP_MIN[sleepMode] + ' min') : T('已取消睡前定時', 'Sleep timer off'));
   }
   function ppLabel(el) {
     var pp = el && q1('[data-gxr-bar=pp]', el); if (!pp) return;
@@ -3930,7 +4018,7 @@ window.GXR_SCM={"m":["丟並乾亂亙亞佈佔併來係俱倉個們倖倫偉側�
     }
     if (t.closest('#gxrTop')) { e.preventDefault(); if (BR().readPage) BR().readPage(); return; }
     if ((x = t.closest('[data-gxr-pb]'))) { e.preventDefault(); e.stopPropagation(); if (BR().from) BR().from(x.getAttribute('data-gxr-pb')); return; }
-    if ((x = t.closest('[data-gxr-bar]'))) { e.preventDefault(); if (x.getAttribute('data-gxr-bar') === 'stop') { if (BR().stop) BR().stop(); } else barToggle(); return; }
+    if ((x = t.closest('[data-gxr-bar]'))) { e.preventDefault(); var bk = x.getAttribute('data-gxr-bar'); if (bk === 'stop') { if (BR().stop) BR().stop(); } else if (bk === 'sleep') { sleepCycle(); } else barToggle(); return; }
     if ((x = t.closest('[data-gxr-studio]'))) {
       e.preventDefault();
       if (!window.GXU) { toast(T('美圖工作室還沒載入', 'Card studio is not ready')); return; }
@@ -3964,6 +4052,7 @@ window.GXR_SCM={"m":["丟並乾亂亙亞佈佔併來係俱倉個們倖倫偉側�
     '.gxq{border:1px solid var(--line,#D5D9E3);background:var(--surface,var(--card,#fff));color:var(--ink,#1A2233);border-radius:999px;padding:5px 11px;font:inherit;font-size:.84em;cursor:pointer}',
     '#gxrBar{position:fixed;left:50%;transform:translateX(-50%) translateY(20px);bottom:76px;display:none;align-items:center;gap:8px;background:rgba(20,24,32,.94);color:#fff;border-radius:999px;padding:7px 8px 7px 16px;z-index:60;box-shadow:0 6px 18px rgba(0,0,0,.28);max-width:92vw;font-size:14px}',
     '#gxrBar.on{display:flex;transform:translateX(-50%)}',
+    '#gxrBar #gxrSleep{width:auto;min-width:38px;padding:0 8px;font-size:14px}#gxrBar #gxrSleep.on{background:var(--gold,#D9B168);color:#1a2233}',
     '#gxrBar .gxbt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
     '#gxrBar button{border:0;background:rgba(255,255,255,.16);color:#fff;width:38px;height:38px;border-radius:50%;font-size:16px;cursor:pointer}',
     '.msg.ai .gxr-fu .gxq{max-width:100%}',
@@ -4364,9 +4453,9 @@ window.GXR_SCM={"m":["丟並乾亂亙亞佈佔併來係俱倉個們倖倫偉側�
 })();
 </script>
 <script>window.CR321_CFG={pfx:'gs321-',names:{zh:'321福音同行',zs:'321福音同行',en:'321 Gospel Companion'},root:function(){return document.getElementById('view')||document.body},top:function(){var s=document.getElementById('sheet');return(s&&s.className.indexOf('hidden')<0)?s.querySelector('header.topbar'):document.querySelector('header.topbar')},scroller:function(){var s=document.getElementById('sheet');return(s&&s.className.indexOf('hidden')<0)?document.getElementById('sheetView'):window},nav:function(){var G=window.__G,R=G&&G.R;if(!R)return null;if(['today','tools','cards','learn'].indexOf(R.tab)<0)return null;var SH={handsIndex:[],handsHand:['id'],handsFinger:['h','i'],gospel:[],slides:['i'],script:['id'],decision:[],cost:[],faq:['cat'],ice:[],frustration:[],track:['id'],lesson:['t','l'],res:[],prayers:['focus'],cards:[],tenIndex:[],tenFlow:[],tenIce:[],tenFive:[],tenOne:['id'],tenTurn:['id'],tenGrow:[],blIndex:[],blHow:[]};var st=[];for(var i=0;i<R.stack.length;i++){var e=R.stack[i],ks=SH[e.name];if(!ks)return null;var a={};for(var j=0;j<ks.length;j++){var v=e.arg&&e.arg[ks[j]];if(v!=null){if(typeof v!=='string'&&typeof v!=='number')return null;if(String(v).length>60)return null;a[ks[j]]=v}}st.push([e.name,a,String(e.title||'').slice(0,40)])}return st.length?{tab:R.tab,st:st}:{tab:R.tab}},go:function(o){var G=window.__G,R=G.R;try{G.TTS&&G.TTS.stop&&G.TTS.stop()}catch(e){}if(R.tab!==o.tab){G.go(o.tab)}else if(R.stack.length){G.closeSheet()}var st=o.st||[];for(var i=0;i<st.length;i++)G.push(st[i][0],st[i][1],st[i][2])}};</script>
-<script src="coread.js?v=4.9.3-k3m-vp1023-gx1103-co1-up1103-xz1103-xzm1103"></script>
+<script src="coread.js?v=4.9.3-k3m-vp1023-gx1103-co1-up1103-xz1103-xzm1103-rf1105"></script>
 <script>window.UPD321_PFX=["g321-"];window.UPD321_LANG=function(){var l=window.I18N&&I18N.lang;return l==="en"?"en":(l==="sc"?"sc":"tc");};</script>
-<script src="upd321.js?v=4.9.3-k3m-vp1023-gx1103-co1-up1103-xz1103-xzm1103"></script>
+<script src="upd321.js?v=4.9.3-k3m-vp1023-gx1103-co1-up1103-xz1103-xzm1103-rf1105"></script>
 <script src="xzm.js?v=xzm1103"></script>
 <script>document.addEventListener('DOMContentLoaded',function(){try{XZM.install(XZM.preset.mini({host:'gospel',slug:'321gospel'}));}catch(e){}});</script>
 </body>

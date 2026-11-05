@@ -475,7 +475,7 @@ function baseSystem() {
     '',
     '【回答的方式】',
     '一律用繁體中文。引用聖經一律用《和合本》，只在你確實有把握時引用，絕不杜撰經文或出處；不確定就誠實說明。',
-    '回應要務實、可以馬上做，實際篇幅依下方的長度設定。先接住他的心情，再給一到兩個具體可行的下一步，必要時加上一句經文或一段簡短的禱告。',
+    '回應要務實、可以馬上做，實際篇幅依下方的長度設定。先接住他的心情，再給一到兩個具體可行的下一步，必要時加上一句經文；需要禱告時，用「引導禱告」邀請他用自己的話向神開口，不替他禱告、不把他的名字寫進禱告（他明確要你寫禱告詞時才寫）。',
     '因為回答可能會被朗讀出來：請用自然口語，不要使用表格、不要用直線分隔、不要用井號標題、不要用星號粗體、不要用條列符號。經文出處請寫成可朗讀的形式，例如「約翰福音三章十六節」。',
     '若他要求代擬訊息（例如 LINE 或簡訊），請直接寫出可以複製貼上的短訊，語氣自然、不像傳單、不說教，長度以三到五句為宜。',
     '',
@@ -535,7 +535,7 @@ async function contLast() {
   if (!m || m.role !== 'assistant' || chat.busy) return;
   chat.busy = true; draw(); toBottom();
   try {
-    var base = chat.msgs.map(function (x) { return { role: x.role, content: x.text }; });
+    var base = chat.msgs.filter(function (x) { return !x.crisis; }).map(function (x) { return { role: x.role, content: x.text }; });
     var r = await fetchOnce(base.concat([{ role: 'user', content: XZ_CONT }]));
     m.text += r.t; m.cut = r.sr === 'max_tokens';
   } catch (e) { toast(XL('小智暫時連不上線，請稍後再試', 'Xiaozhi cannot connect right now')); }
@@ -550,7 +550,7 @@ async function call() {
   var ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
   var timer = ctrl ? setTimeout(function () { try { ctrl.abort(); } catch (e) {} }, 40000) : null;
   try {
-    var base = chat.msgs.map(function (m) { return { role: m.role, content: m.text }; });
+    var base = chat.msgs.filter(function (m) { return !m.crisis; }).map(function (m) { return { role: m.role, content: m.text }; });
     var r1 = await fetchOnce(base, ctrl), text = r1.t, sr = r1.sr, more = 0;
     while (sr === 'max_tokens' && text && more < 4) {
       more++;
@@ -714,6 +714,7 @@ function send(t) {
   try { XZ2.collapse(); } catch (e) {}
   chat.msgs.forEach(function (m) { if (m.role === 'assistant') m.col = true; });
   chat.msgs.push({ role: 'user', text: t });
+  try { if (window.XZ2 && XZ2.crisisHit(t)) { chat.msgs.push({ role: 'assistant', text: XZ2.crisisCard().replace(/\*\*/g, ''), crisis: true }); } } catch (e) {}
   draw(); toBottom(); call();
 }
 /* XZ2 掛點：切長度／信仰背景時，把最後一組問答拿掉，用同一個問題重新回答（取代、不疊加） */
